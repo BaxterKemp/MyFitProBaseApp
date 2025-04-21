@@ -20,8 +20,7 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
     };
 
     const handleLiveReplay = () => {
-        // TODO: Implement live replay functionality
-        console.log('Live replay button pressed');
+        navigation.navigate('LiveReplay');
     };
 
     const isLive = true; // TODO: Implement API call to check if the business is live

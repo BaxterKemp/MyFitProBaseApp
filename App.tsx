@@ -12,6 +12,8 @@ import LoginScreen from './app/screens/LoginScreen';
 import HomeScreen from './app/screens/HomeScreen';
 import LivestreamScreen from './app/screens/LivestreamScreen';
 import ViewersListScreen from './app/screens/ViewersListScreen';
+import LiveReplayScreen from './app/screens/LiveReplayScreen';
+import ReplayDetailScreen from './app/screens/ReplayDetailScreen';
 
 // Prevent the splash screen from auto-hiding
 SplashScreen.preventAutoHideAsync();
@@ -22,6 +24,16 @@ export type RootStackParamList = {
     Home: undefined;
     Livestream: undefined;
     ViewersList: undefined;
+    LiveReplay: undefined;
+    ReplayDetail: {
+        replayData: {
+            id: string;
+            title: string;
+            thumbnail: string;
+            timeAgo: string;
+            duration: string;
+        }
+    };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -101,6 +113,25 @@ export default function App() {
                             presentation: 'modal',
                             headerShown: false,
                             animation: 'slide_from_bottom',
+                        }}
+                    />
+                    <Stack.Screen
+                        name="LiveReplay"
+                        component={LiveReplayScreen}
+                        options={{
+                            headerTitle: "Live Replay",
+                            headerBackTitle: "Back",
+                            headerShown: true,
+                            animation: 'slide_from_right',
+                        }}
+                    />
+                    <Stack.Screen
+                        name="ReplayDetail"
+                        component={ReplayDetailScreen}
+                        options={{
+                            headerTitle: "Replay",
+                            headerShown: true,
+                            animation: 'slide_from_right',
                         }}
                     />
                 </Stack.Navigator>

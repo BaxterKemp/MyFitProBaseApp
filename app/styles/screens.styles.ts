@@ -318,3 +318,69 @@ export const commentStyles = StyleSheet.create({
         backgroundColor: '#E0E0E0'
     }
 });
+
+export const replayDetailStyles = StyleSheet.create({
+    container: {
+        ...commonStyles.container,
+    },
+    content: {
+        padding: spacing.lg,
+    },
+    detailsContainer: {
+        alignItems: 'flex-start',
+    },
+    title: {
+        fontSize: typography.sizes.lg,
+        fontWeight: typography.weights.bold,
+        color: colors.text.primary,
+        marginBottom: spacing.sm,
+    },
+    timeInfo: {
+        fontSize: typography.sizes.md,
+        color: colors.text.secondary,
+        marginBottom: spacing.xl,
+    }
+});
+
+export const liveReplayStyles = StyleSheet.create({
+    container: {
+        ...commonStyles.container,
+    },
+    listContent: {
+        paddingVertical: spacing.md,
+    },
+    replayItem: {
+        flexDirection: 'row',
+        padding: spacing.md,
+        borderBottomWidth: 1,
+        borderBottomColor: colors.border,
+        alignItems: 'center',
+    },
+    thumbnail: {
+        width: 120,
+        height: 80,
+        borderRadius: 4,
+    },
+    contentContainer: {
+        flex: 1,
+        marginHorizontal: spacing.md,
+    },
+    title: {
+        fontSize: typography.sizes.md,
+        fontWeight: typography.weights.semibold,
+        color: colors.text.primary,
+        marginBottom: spacing.xs,
+    },
+    subText: {
+        fontSize: typography.sizes.sm,
+        color: colors.text.secondary,
+    },
+    playButton: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: colors.primary,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+});
