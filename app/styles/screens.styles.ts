@@ -1,8 +1,8 @@
 import { StyleSheet } from 'react-native';
 import { colors } from '../theme/colors';
-import { spacing, layout } from '../theme/spacing';
-import { typography } from '../theme/typography';
 import { commonStyles } from '../theme/common.styles';
+import { layout, spacing } from '../theme/spacing';
+import { typography } from '../theme/typography';
 
 export const globalStyles = StyleSheet.create({
     headerContainer: {

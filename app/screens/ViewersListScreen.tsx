@@ -1,12 +1,11 @@
-import React from 'react';
-import { View, Text, FlatList, TouchableOpacity } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { StackActions } from '@react-navigation/native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { X } from 'lucide-react-native';
+import React from 'react';
+import { FlatList, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { RootStackParamList } from '../../App';
+import { viewersListStyles } from '../styles/screens.styles';
 import { colors } from '../theme/colors';
-import { globalStyles, viewersListStyles } from '../styles/screens.styles';
 
 type ViewersListScreenProps = {
     navigation: NativeStackNavigationProp<RootStackParamList, 'ViewersList'>;

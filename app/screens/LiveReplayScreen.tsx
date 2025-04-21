@@ -1,11 +1,11 @@
-import React from 'react';
-import { View, Text, FlatList, TouchableOpacity, Image } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { Play } from 'lucide-react-native';
+import React from 'react';
+import { FlatList, Image, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { RootStackParamList } from '../../App';
-import { colors } from '../theme/colors';
 import { liveReplayStyles } from '../styles/screens.styles';
+import { colors } from '../theme/colors';
 
 type LiveReplayScreenProps = {
     navigation: NativeStackNavigationProp<RootStackParamList, 'LiveReplay'>;

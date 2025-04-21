@@ -1,12 +1,9 @@
-import React from 'react';
-import { View, Text, Image, TouchableOpacity, ScrollView } from 'react-native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import React from 'react';
+import { Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Play } from 'lucide-react-native';
 import { RootStackParamList } from '../../App';
-import { colors } from '../theme/colors';
-import { spacing } from '../theme/spacing';
 import { replayDetailStyles, videoStyles } from '../styles/screens.styles';
 
 type ReplayDetailScreenProps = {

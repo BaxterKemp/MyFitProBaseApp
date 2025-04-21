@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Platform, StatusBar } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { globalStyles, loginStyles } from '../styles/screens.styles';
+import React, { useState } from 'react';
+import { Platform, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { RootStackParamList } from '../../App';
+import { globalStyles, loginStyles } from '../styles/screens.styles';
 
 type LoginScreenProps = {
     navigation: NativeStackNavigationProp<RootStackParamList, 'Login'>;

@@ -1,10 +1,9 @@
-import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { StackActions } from '@react-navigation/native';
-import { globalStyles, homeStyles } from '../styles/screens.styles';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import React from 'react';
+import { Text, TouchableOpacity, View } from 'react-native';
 import { RootStackParamList } from '../../App';
+import { globalStyles, homeStyles } from '../styles/screens.styles';
 
 type HomeScreenProps = {
     navigation: NativeStackNavigationProp<RootStackParamList, 'Home'>;

@@ -1,12 +1,11 @@
-import React, { useState, useRef } from 'react';
-import { View, Text, TouchableOpacity, TextInput, FlatList, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { StackActions } from '@react-navigation/native';
-import { globalStyles, homeStyles, videoStyles, commentStyles } from '../styles/screens.styles';
+import { ArrowUp, EyeIcon } from 'lucide-react-native';
+import React, { useRef, useState } from 'react';
+import { FlatList, KeyboardAvoidingView, Platform, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { RootStackParamList } from '../../App';
+import { commentStyles, globalStyles, videoStyles } from '../styles/screens.styles';
 import { colors } from '../theme/colors';
-import { EyeIcon, ArrowUp } from 'lucide-react-native';
 
 type LivestreamScreenProps = {
     navigation: NativeStackNavigationProp<RootStackParamList, 'Livestream'>;
