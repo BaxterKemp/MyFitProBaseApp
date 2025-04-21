@@ -24,6 +24,8 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
         console.log('Live replay button pressed');
     };
 
+    const isLive = true; // TODO: Implement API call to check if the business is live
+
     return (
         <View style={globalStyles.container}>
             <View style={globalStyles.headerContainer}>
@@ -31,11 +33,18 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
             </View>
 
             {/* Live indicator */}
-            <View style={homeStyles.liveButtonContainer}>
-                <View style={homeStyles.liveIndicator}>
-                    <Text style={homeStyles.liveText}>● LIVE</Text>
+            {isLive ?
+                <View style={homeStyles.liveButtonContainer}>
+                    <View style={homeStyles.liveIndicator}>
+                        <Text style={homeStyles.liveText}>● LIVE</Text>
+                    </View>
                 </View>
-            </View>
+                : <View style={homeStyles.liveButtonContainer}>
+                    <View style={homeStyles.offlineIndicator}>
+                        <Text style={homeStyles.offlineText}>OFFLINE</Text>
+                    </View>
+                </View>}
+
 
             {/* Main buttons area */}
             <View style={homeStyles.buttonContainer}>

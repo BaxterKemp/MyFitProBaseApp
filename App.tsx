@@ -82,6 +82,7 @@ export default function App() {
                         component={LivestreamScreen}
                         options={{
                             headerShown: true,
+                            headerBackTitle: "Leave",
                             headerRight: () => (
                                 <TouchableOpacity
                                     onPress={() => console.log('Cast button pressed')}

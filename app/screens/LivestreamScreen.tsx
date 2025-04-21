@@ -3,8 +3,10 @@ import { View, Text, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { StackActions } from '@react-navigation/native';
-import { globalStyles, homeStyles } from '../styles/screens.styles';
+import { globalStyles, homeStyles, videoStyles } from '../styles/screens.styles';
 import { RootStackParamList } from '../../App';
+import { colors } from '../theme/colors';
+import { EyeIcon } from 'lucide-react-native';
 
 type LivestreamScreenProps = {
     navigation: NativeStackNavigationProp<RootStackParamList, 'Livestream'>;
@@ -24,16 +26,27 @@ export default function LivestreamScreen({ navigation }: LivestreamScreenProps) 
         console.log('Live replay button pressed');
     };
 
+    const isLive = true; // TODO: Implement API call to check if the business is live
+
     return (
-        <SafeAreaView style={globalStyles.container}>
-            <View style={globalStyles.headerContainer}>
+        <View style={globalStyles.container}>
+            <View style={videoStyles.videoContainer}>
                 {/* TODO: Add API Logo implementation */}
             </View>
 
             {/* Live indicator below logo */}
-            <View style={homeStyles.liveButtonContainer}>
-                <View style={homeStyles.liveIndicator}>
-                    <Text style={homeStyles.liveText}>● LIVE</Text>
+            <View style={videoStyles.livestreamInfoContainer}>
+                {isLive ?
+                    <View style={videoStyles.liveIndicatorContainer}>
+                        <Text style={videoStyles.liveText}>● LIVE</Text>
+                    </View>
+                    : <View style={videoStyles.offlineIndicator}>
+                        <Text style={videoStyles.offlineText}>OFFLINE</Text>
+                    </View>}
+                <View style={videoStyles.viewerCountContainer}>
+                    <Text><EyeIcon size={16} color={colors.white} /></Text>
+                    {/* TODO: Add API viewer count */}
+                    <Text style={videoStyles.viewerCountText}>100</Text>
                 </View>
             </View>
 
@@ -46,6 +59,6 @@ export default function LivestreamScreen({ navigation }: LivestreamScreenProps) 
             <View style={homeStyles.logoutButtonContainer}>
 
             </View>
-        </SafeAreaView>
+        </View>
     );
 } 
