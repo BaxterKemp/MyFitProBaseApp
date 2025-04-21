@@ -175,3 +175,146 @@ export const videoStyles = StyleSheet.create({
         fontSize: typography.sizes.xs,
     },
 });
+
+export const viewersListStyles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: colors.background,
+    },
+    header: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: 20,
+        paddingVertical: 15,
+        borderBottomWidth: 1,
+        borderBottomColor: colors.border,
+    },
+    title: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: colors.text.primary,
+    },
+    closeButton: {
+        padding: 5,
+    },
+    listContent: {
+        paddingHorizontal: 20,
+    },
+    viewerItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: 15,
+        borderBottomWidth: 1,
+        borderBottomColor: colors.border,
+    },
+    viewerAvatar: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: colors.primary,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 15,
+    },
+    viewerInitial: {
+        color: colors.white,
+        fontSize: 18,
+        fontWeight: 'bold',
+    },
+    viewerName: {
+        fontSize: 16,
+        color: colors.text.primary,
+    },
+});
+
+export const commentStyles = StyleSheet.create({
+    container: {
+        flex: 1,
+        borderTopWidth: 1,
+        borderTopColor: colors.border
+    },
+    commentItem: {
+        padding: 12,
+        borderBottomWidth: 1,
+        borderBottomColor: colors.border
+    },
+    commentHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 4
+    },
+    userName: {
+        fontWeight: 'bold'
+    },
+    timestamp: {
+        color: 'gray',
+        fontSize: 12
+    },
+    commentText: {
+        marginBottom: 8
+    },
+    reactionsContainer: {
+        flexDirection: 'row',
+        alignItems: 'center'
+    },
+    addReactionButton: {
+        backgroundColor: '#4285F4',
+        paddingHorizontal: 15,
+        paddingVertical: 8,
+        borderRadius: 50,
+        marginRight: 8
+    },
+    reactionButton: {
+        backgroundColor: '#4285F4',
+        paddingHorizontal: 15,
+        paddingVertical: 8,
+        borderRadius: 50,
+        marginRight: 8,
+        flexDirection: 'row',
+        alignItems: 'center'
+    },
+    reactionText: {
+        marginRight: 4
+    },
+    reactionCount: {
+        color: 'white',
+        fontWeight: 'bold'
+    },
+    addReactionText: {
+        color: 'white',
+        fontWeight: 'bold'
+    },
+    inputContainer: {
+        flexDirection: 'row',
+        padding: 10,
+        borderTopWidth: 1,
+        borderTopColor: colors.border,
+        backgroundColor: colors.background,
+        alignItems: 'center'
+    },
+    textInput: {
+        flex: 1,
+        borderWidth: 1,
+        borderColor: colors.border,
+        borderRadius: 20,
+        paddingHorizontal: 15,
+        paddingVertical: 8,
+        marginRight: 10,
+        height: 40,
+        backgroundColor: 'white'
+    },
+    sendButton: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    sendButtonActive: {
+        backgroundColor: '#4285F4'
+    },
+    sendButtonInactive: {
+        backgroundColor: '#E0E0E0'
+    }
+});
