@@ -132,6 +132,13 @@ export default function App() {
                             headerTitle: "Replay",
                             headerShown: true,
                             animation: 'slide_from_right',
+                            headerRight: () => (
+                                <TouchableOpacity
+                                    onPress={() => console.log('Cast button pressed')}
+                                >
+                                    <Cast size={24} />
+                                </TouchableOpacity>
+                            ),
                         }}
                     />
                 </Stack.Navigator>
