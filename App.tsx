@@ -11,6 +11,7 @@ import { Cast, Settings } from 'lucide-react-native';
 import LoginScreen from './app/screens/LoginScreen';
 import HomeScreen from './app/screens/HomeScreen';
 import LivestreamScreen from './app/screens/LivestreamScreen';
+import ViewersListScreen from './app/screens/ViewersListScreen';
 
 // Prevent the splash screen from auto-hiding
 SplashScreen.preventAutoHideAsync();
@@ -20,6 +21,7 @@ export type RootStackParamList = {
     Login: undefined;
     Home: undefined;
     Livestream: undefined;
+    ViewersList: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -90,6 +92,15 @@ export default function App() {
                                     <Cast size={24} />
                                 </TouchableOpacity>
                             ),
+                        }}
+                    />
+                    <Stack.Screen
+                        name="ViewersList"
+                        component={ViewersListScreen}
+                        options={{
+                            presentation: 'modal',
+                            headerShown: false,
+                            animation: 'slide_from_bottom',
                         }}
                     />
                 </Stack.Navigator>

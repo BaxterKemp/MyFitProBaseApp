@@ -26,7 +26,12 @@ export default function LivestreamScreen({ navigation }: LivestreamScreenProps) 
         console.log('Live replay button pressed');
     };
 
+    const handleViewersList = () => {
+        navigation.navigate('ViewersList');
+    };
+
     const isLive = true; // TODO: Implement API call to check if the business is live
+    const viewerCount = 8; // Mock viewer count - would be replaced with API data
 
     return (
         <View style={globalStyles.container}>
@@ -43,11 +48,14 @@ export default function LivestreamScreen({ navigation }: LivestreamScreenProps) 
                     : <View style={videoStyles.offlineIndicator}>
                         <Text style={videoStyles.offlineText}>OFFLINE</Text>
                     </View>}
-                <View style={videoStyles.viewerCountContainer}>
+                <TouchableOpacity
+                    style={videoStyles.viewerCountContainer}
+                    onPress={handleViewersList}
+                >
                     <Text><EyeIcon size={16} color={colors.white} /></Text>
                     {/* TODO: Add API viewer count */}
-                    <Text style={videoStyles.viewerCountText}>100</Text>
-                </View>
+                    <Text style={videoStyles.viewerCountText}>{viewerCount}</Text>
+                </TouchableOpacity>
             </View>
 
             {/* Main buttons area */}
