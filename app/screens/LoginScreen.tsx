@@ -4,21 +4,51 @@ import { Platform, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, Vie
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { RootStackParamList } from '../../App';
 import { globalStyles, loginStyles } from '../styles/screens.styles';
+import axios from 'axios';
+
 
 type LoginScreenProps = {
     navigation: NativeStackNavigationProp<RootStackParamList, 'Login'>;
 };
 
 export default function LoginScreen({ navigation }: LoginScreenProps) {
-    const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
-    const handleLogin = () => {
-        // TODO: Implement actual login logic
-        console.log('Login pressed with:', { name, password });
-        navigation.push('Home');
+    const handleLogin = async () => {
+        if (!email.trim() || !password.trim()) {
+            alert('Please enter both email and password.');
+            return;
+        }
+    
+        const form = new FormData();
+        form.append('email', email.trim());
+        form.append('password', password.trim());
+    
+        const options = {
+            method: 'POST',
+            url: 'https://api.myfitpro.com/v1/user/login',
+            headers: {
+                'Content-Type': 'multipart/form-data', // Do NOT add boundary manually
+                Accept: 'application/json',
+            },
+            data: form,
+        };
+    
+        try {
+            const { data } = await axios.request(options);
+            console.log('Login successful:', data);
+    
+            // Store token if needed
+            // await AsyncStorage.setItem('authToken', data.token);
+    
+            navigation.push('Home');
+        } catch (error: any) {
+            console.error('Login error:', error.response?.data || error.message);
+            alert('Login failed. Please try again.');
+        }
     };
-
+    
     return (
         <SafeAreaView style={[globalStyles.container, styles.container]}>
             <View style={globalStyles.headerContainer}>
@@ -29,9 +59,9 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
                 <View style={globalStyles.formContainer}>
                     <TextInput
                         style={globalStyles.input}
-                        placeholder="Name"
-                        value={name}
-                        onChangeText={setName}
+                        placeholder="Email"
+                        value={email}
+                        onChangeText={setEmail}
                         autoCapitalize="words"
                     />
 
