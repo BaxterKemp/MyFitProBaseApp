@@ -26,7 +26,7 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
     useEffect(() => {
         const fetchLivestreamStatus = async () => {
             try {
-                const response = await fetch('https://api.myfitpro.com/v1/business/YOUR_BUSINESS_ID/status');
+                const response = await fetch('https://api.myfitpro.com/v1/business/993/status');
                 const data = await response.json();
                 setIsLive(data.isLive);
             } catch (error) {
