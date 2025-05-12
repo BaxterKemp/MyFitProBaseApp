@@ -55,69 +55,73 @@ export default function LivestreamScreen({ navigation }: LivestreamScreenProps) 
         const interval = setInterval(fetchLivestreamStatus, 5000);
         return () => clearInterval(interval);
     }, []);
-    // Comment Data TODO: Replace with API data
-    const comments: Comment[] = [
-        {
-            id: '1',
-            userName: 'John',
-            text: 'This is awesome!',
-            timestamp: '2:30 PM',
-            reactions: [
-                { type: '😊', count: 3 },
-                { type: '❤️', count: 2 }
-            ]
-        },
-        {
-            id: '2',
-            userName: 'Sarah',
-            text: 'Great session today! Loved the content.',
-            timestamp: '2:32 PM',
-            reactions: [
-                { type: '😊', count: 1 },
-                { type: '❤️', count: 3 },
-                { type: '💪', count: 2 }
-            ]
-        },
-        {
-            id: '3',
-            userName: 'Mike',
-            text: 'When is the next session?',
-            timestamp: '2:35 PM',
-            reactions: []
-        },
-        {
-            id: '4',
-            userName: 'Emma',
-            text: 'Could you please explain that last part again?',
-            timestamp: '2:37 PM',
-            reactions: [
-                { type: '👍', count: 1 }
-            ]
-        },
-        {
-            id: '5',
-            userName: 'David',
-            text: 'Thanks for the tips!',
-            timestamp: '2:39 PM',
-            reactions: [
-                { type: '🙏', count: 4 }
-            ]
+
+    const [comments, setComments] = useState<Comment[]>([]);
+
+    const fetchComments = async () => {
+        try {
+            const response = await fetch(
+                'https://api.myfitpro.com/v1/business/993/comments',
+                {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Authorization': 'Bearer TODO', // Replace with actual token
+                    },
+                }
+            );
+    
+            if (!response.ok) {
+                throw new Error('Failed to fetch comments');
+            }
+    
+            const data = await response.json();
+            setComments(data);
+        } catch (error) {
+            console.error('Error fetching comments:', error);
         }
-    ]
+    };
+    
+    useEffect(() => {
+        fetchComments();
+        const interval = setInterval(fetchComments, 5000);
+        return () => clearInterval(interval);
+    }, []);
+    
+    const handleSendComment = async () => {
+        if (comment.trim() === '') return;
+        
+        const form = new FormData();
+        form.append('body', comment);
+
+        try {
+            const response = await fetch('https://api.myfitpro.com/v1/business/993/comments', {
+                method: 'POST',
+                headers: {
+                    Accept: 'application/json',
+                    Authorization: 'Bearer TODO', 
+                },
+                body: form,
+            });
+
+            if( !response.ok) {
+                throw new Error('Failed to send comment');
+            }
+
+            const data = await response.json();
+            console.log('Comment posted:', data);
+
+            setComment('');          
+    }
+    catch (error) {
+        console.error('Error sending comment:', error);
+    }
+};
 
     const handleViewersList = () => {
         navigation.navigate('ViewersList');
     };
 
-    const handleSendComment = () => {
-        if (comment.trim() === '') return;
-
-        // Instead of adding the comment, just log to console
-        console.log('Comment submitted:', comment);
-
-        // Clear the input field
-        setComment('');
-    };
 
     // Scroll to bottom of the comments list
     const scrollToBottom = () => {
