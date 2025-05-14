@@ -13,40 +13,62 @@ type LoginScreenProps = {
 };
 
 export default function LoginScreen({ navigation }: LoginScreenProps) {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const [name, setName] = useState('');
+    const [class_password, setPassword] = useState('');
+    const [business_id, setID] = useState('');
 
     const handleLogin = async () => {
-        if (!email.trim() || !password.trim()) {
-            alert('Please enter both email and password.');
+        const trimmedName = name.trim();
+        const trimmedPassword = class_password.trim();
+        const trimmedID = business_id.trim();
+
+        if (!trimmedName || !trimmedPassword || !trimmedID) {
+            Alert.alert('Missing Fields', 'Please fill in all fields.');
             return;
         }
     
-        const form = new FormData();
-        form.append('email', email.trim());
-        form.append('password', password.trim());
-    
-        const options = {
-            method: 'POST',
-            url: 'https://api.myfitpro.com/v1/user/login',
-            headers: {
-                'Content-Type': 'multipart/form-data', // Do NOT add boundary manually
-                Accept: 'application/json',
-            },
-            data: form,
-        };
-    
+        const formData = new FormData();
+        formData.append('business_slug', ''); // as per your request sample
+        formData.append('business_id', trimmedID);
+        formData.append('name', trimmedName);
+        formData.append('class_password', trimmedPassword);
+
         try {
-            const { data } = await axios.request(options);
-            console.log('Login successful:', data);
-    
-            // Store token if needed
-            // await AsyncStorage.setItem('authToken', data.token);
-    
-            navigation.push('Home');
+            const response = await axios.post(
+                'https://api.myfitpro.com/v1/login',
+                formData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                        Accept: 'application/json',
+                    },
+                }
+            );
+
+            const data = response.data;
+
+            if (data.token) {
+                await AsyncStorage.setItem('Token', data.token);
+
+                // Optional: Store more for future use
+                await AsyncStorage.setItem('LoginInfo', JSON.stringify({
+                    name: data.name,
+                    login_id: data.login_id,
+                    business_id: data.business_id,
+                    business_slug: data.business_slug,
+                    expires_at: data.expires_at
+                }));
+
+                console.log('Login successful:', data.message);
+                navigation.replace('Home'); // Navigate to homepage
+            } else {
+                Alert.alert('Login Failed', 'No token received from server.');
+            }
+
         } catch (error: any) {
-            console.error('Login error:', error.response?.data || error.message);
-            alert('Login failed. Please try again.');
+            const message = error?.response?.data?.message || 'Login failed. Please check your credentials.';
+            console.error('Login error:', message);
+            Alert.alert('Login Failed', message);
         }
     };
     
@@ -58,19 +80,27 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
 
             <View style={globalStyles.mainContent}>
                 <View style={globalStyles.formContainer}>
-                    <TextInput
+                <TextInput
                         style={globalStyles.input}
-                        placeholder="Email"
-                        value={email}
-                        onChangeText={setEmail}
+                        placeholder="Name"
+                        value={name}
+                        onChangeText={setName}
                         autoCapitalize="words"
                     />
 
                     <TextInput
                         style={globalStyles.input}
-                        placeholder="Password"
-                        value={password}
+                        placeholder="Class Password"
+                        value={class_password}
                         onChangeText={setPassword}
+                        secureTextEntry
+                    />
+
+                    <TextInput
+                        style={globalStyles.input}
+                        placeholder="Business ID"
+                        value={business_id}
+                        onChangeText={setID}
                         secureTextEntry
                     />
 
