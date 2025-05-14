@@ -4,14 +4,16 @@ import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { RootStackParamList } from '../../App';
 import { globalStyles, homeStyles } from '../styles/screens.styles';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type HomeScreenProps = {
     navigation: NativeStackNavigationProp<RootStackParamList, 'Home'>;
 };
 
 export default function HomeScreen({ navigation }: HomeScreenProps) {
-    const handleLogout = () => {
-        navigation.dispatch(StackActions.pop());
+    const handleLogout = async () => {
+        await AsyncStorage.clear(); // Clear stored token
+        navigation.replace('Login'); // Reset stack and go to Login
     };
 
     const handleLivestream = () => {
