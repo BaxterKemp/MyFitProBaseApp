@@ -28,7 +28,7 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
         }
     
         const formData = new FormData();
-        formData.append('business_slug', ''); // as per your request sample
+        formData.append('business_slug', ''); // as per your request sample, however Alex said the post data would just need to include name, class_password, and business_id.
         formData.append('business_id', trimmedID);
         formData.append('name', trimmedName);
         formData.append('class_password', trimmedPassword);
@@ -49,6 +49,7 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
 
             if (data.token) {
                 await AsyncStorage.setItem('Token', data.token);
+                console.log("This is token data: " + data.token);
 
                 // Optional: Store more for future use
                 await AsyncStorage.setItem('LoginInfo', JSON.stringify({
