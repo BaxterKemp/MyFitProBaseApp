@@ -7,11 +7,13 @@ import { RootStackParamList } from '../../App';
 import { commentStyles, globalStyles, videoStyles } from '../styles/screens.styles';
 import { colors } from '../theme/colors';
 import { Video } from 'expo-av';
+import { RouteProp } from '@react-navigation/native';
 
 
 
 type LivestreamScreenProps = {
     navigation: NativeStackNavigationProp<RootStackParamList, 'Livestream'>;
+    route: RouteProp<RootStackParamList, 'Livestream'>;
 };
 
 // Comment type definition
@@ -28,7 +30,8 @@ type Comment = {
     reactions: Reaction[];
 };
 
-export default function LivestreamScreen({ navigation }: LivestreamScreenProps) {
+export default function LivestreamScreen({ navigation, route }: LivestreamScreenProps) {
+    const [token] = route.params;
     const [comment, setComment] = useState('');
     const [isLive, setIsLive] = useState(false);
     const [viewerCount, setViewerCount] = useState(0);
@@ -66,7 +69,7 @@ export default function LivestreamScreen({ navigation }: LivestreamScreenProps) 
                     method: 'GET',
                     headers: {
                         'Accept': 'application/json',
-                        'Authorization': 'Bearer TODO', // Replace with actual token
+                        'Authorization': 'Bearer ${token}',
                     },
                 }
             );
@@ -99,7 +102,7 @@ export default function LivestreamScreen({ navigation }: LivestreamScreenProps) 
                 method: 'POST',
                 headers: {
                     Accept: 'application/json',
-                    Authorization: 'Bearer TODO', 
+                    Authorization: 'Bearer ${token}', 
                 },
                 body: form,
             });
