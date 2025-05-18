@@ -1,77 +1,142 @@
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Play } from 'lucide-react-native';
-import React from 'react';
-import { FlatList, Image, Text, TouchableOpacity, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import {
+  Alert,
+  FlatList,
+  Image,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { RootStackParamList } from '../../App';
 import { liveReplayStyles } from '../styles/screens.styles';
 import { colors } from '../theme/colors';
 
 type LiveReplayScreenProps = {
-    navigation: NativeStackNavigationProp<RootStackParamList, 'LiveReplay'>;
+  navigation: NativeStackNavigationProp<RootStackParamList, 'LiveReplay'>;
 };
 
-// Sample replay data - replace with real data from API
-const replayData = [
-    {
-        id: '1',
-        title: 'Morning Cardio Session',
-        thumbnail: 'https://via.placeholder.com/120x80',
-        timeAgo: '1 day ago',
-        duration: '57 mins'
-    },
-    {
-        id: '2',
-        title: 'HIIT Workout Challenge',
-        thumbnail: 'https://via.placeholder.com/120x80',
-        timeAgo: '3 days ago',
-        duration: '45 mins'
-    },
-    {
-        id: '3',
-        title: 'Yoga for Beginners',
-        thumbnail: 'https://via.placeholder.com/120x80',
-        timeAgo: '1 week ago',
-        duration: '62 mins'
-    },
-    {
-        id: '4',
-        title: 'Full Body Strength Training',
-        thumbnail: 'https://via.placeholder.com/120x80',
-        timeAgo: '2 weeks ago',
-        duration: '50 mins'
-    }
-];
+type ReplayVideo = {
+  id: number;
+  uuid: string;
+  title: string;
+  length: number;
+  thumbnail_url: string;
+  hls_url: string;
+  status: string;
+};
 
-export default function LiveReplayScreen({ navigation }: LiveReplayScreenProps) {
-    const renderReplayItem = ({ item }: { item: typeof replayData[0] }) => (
-        <TouchableOpacity
-            style={liveReplayStyles.replayItem}
-            onPress={() => navigation.navigate('ReplayDetail', { replayData: item })}
-        >
-            <Image
-                source={{ uri: item.thumbnail }}
-                style={liveReplayStyles.thumbnail}
-                resizeMode="cover"
-            />
-            <View style={liveReplayStyles.contentContainer}>
-                <Text style={liveReplayStyles.title}>{item.title}</Text>
-                <Text style={liveReplayStyles.subText}>{`${item.timeAgo} - ${item.duration}`}</Text>
-            </View>
-            <View style={liveReplayStyles.playButton}>
-                <Play size={20} color={colors.white} />
-            </View>
-        </TouchableOpacity>
-    );
+export default function LiveReplayScreen({
+  navigation,
+}: LiveReplayScreenProps) {
+  const [replays, setReplays] = useState<ReplayVideo[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-    return (
-        <SafeAreaView style={liveReplayStyles.container} edges={['left', 'right']}>
-            <FlatList
-                data={replayData}
-                renderItem={renderReplayItem}
-                keyExtractor={item => item.id}
-                contentContainerStyle={liveReplayStyles.listContent}
-            />
-        </SafeAreaView>
-    );
-} 
+  useEffect(() => {
+    const fetchReplays = async () => {
+      setIsLoading(true);
+      try {
+        const token = await AsyncStorage.getItem('Token');
+        if (!token) {
+          throw new Error('No token found. Please log in again.');
+        }
+
+        const response = await fetch(
+          'https://api.myfitpro.com/v1/business/993/videos',
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              Accept: 'application/json',
+            },
+          }
+        );
+
+        const text = await response.text();
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status} - ${text}`);
+        }
+
+        let data: ReplayVideo[];
+        try {
+          data = JSON.parse(text);
+        } catch (err) {
+          const message =
+            err && typeof err === 'object' && 'message' in err
+              ? (err as { message: string }).message
+              : String(err);
+          throw new Error('Invalid JSON response: ' + message);
+        }
+
+        const finishedVideos = data.filter(
+          (video) => video.status === 'Finished'
+        );
+        setReplays(finishedVideos);
+      } catch (error: any) {
+        console.error('Error fetching replay videos:', error.message);
+        Alert.alert('Error', error.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchReplays();
+  }, []);
+
+  const formatDuration = (length: number) => {
+    const minutes = Math.floor(length / 60);
+    const seconds = length % 60;
+    return `${minutes}m ${seconds}s`;
+  };
+
+  const renderReplayItem = ({ item }: { item: ReplayVideo }) => (
+    <TouchableOpacity
+      style={liveReplayStyles.replayItem}
+      onPress={() =>
+        navigation.navigate('ReplayDetail', {
+          replayData: {
+            id: item.uuid,
+            title: item.title,
+            thumbnail: item.thumbnail_url,
+            duration: item.length.toString(),
+            hls_url: item.hls_url,
+            timeAgo: 'N/A',
+          },
+        })
+      }
+    >
+      <Image
+        source={{ uri: item.thumbnail_url }}
+        style={liveReplayStyles.thumbnail}
+        resizeMode="cover"
+      />
+      <View style={liveReplayStyles.contentContainer}>
+        <Text style={liveReplayStyles.title}>{item.title}</Text>
+        <Text style={liveReplayStyles.subText}>
+          {formatDuration(item.length)}
+        </Text>
+      </View>
+      <View style={liveReplayStyles.playButton}>
+        <Play size={20} color={colors.white} />
+      </View>
+    </TouchableOpacity>
+  );
+
+  return (
+    <SafeAreaView style={liveReplayStyles.container} edges={['left', 'right']}>
+      {isLoading ? (
+        <Text style={{ textAlign: 'center', marginTop: 20 }}>Loading...</Text>
+      ) : (
+        <FlatList
+          data={replays}
+          renderItem={renderReplayItem}
+          keyExtractor={(item) => item.uuid}
+          contentContainerStyle={liveReplayStyles.listContent}
+        />
+      )}
+    </SafeAreaView>
+  );
+}
