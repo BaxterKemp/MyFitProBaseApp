@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
+import { ThemeProvider } from './app/theme/ThemeContext';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
@@ -57,92 +58,94 @@ export default function App() {
     }, []);
 
     return (
-        <SafeAreaProvider>
-            <NavigationContainer>
-                <StatusBar style="auto" />
-                <Stack.Navigator
-                    screenOptions={{
-                        headerTitle: () => <LogoTitle />,
-                        headerTitleAlign: 'center',
-                        headerStyle: {
-                            backgroundColor: 'white',
-                        },
-                        headerShadowVisible: true,
-                        animation: 'slide_from_right',
-                        animationTypeForReplace: 'push',
-                        gestureEnabled: true,
-                        gestureDirection: 'horizontal',
-                    }}
-                >
-                    <Stack.Screen
-                        name="Login"
-                        component={LoginScreen}
-                        options={{
-                            headerShown: false,
-                        }}
-                    />
-                    <Stack.Screen
-                        name="Home"
-                        component={HomeScreen}
-                        options={{
-                            headerTitle: "Home",
-                            headerLeft: () => null,
-                            headerBackVisible: false,
-                            gestureEnabled: false,
-                        }}
-                    />
-                    <Stack.Screen
-                        name="Livestream"
-                        component={LivestreamScreen}
-                        options={{
-                            headerShown: true,
-                            headerBackTitle: "Leave",
-                            headerRight: () => (
-                                <TouchableOpacity
-                                    onPress={() => console.log('Cast button pressed')}
-                                >
-                                    <Cast size={24} />
-                                </TouchableOpacity>
-                            ),
-                        }}
-                    />
-                    <Stack.Screen
-                        name="ViewersList"
-                        component={ViewersListScreen}
-                        options={{
-                            presentation: 'modal',
-                            headerShown: false,
-                            animation: 'slide_from_bottom',
-                        }}
-                    />
-                    <Stack.Screen
-                        name="LiveReplay"
-                        component={LiveReplayScreen}
-                        options={{
-                            headerTitle: "Live Replay",
-                            headerBackTitle: "Back",
-                            headerShown: true,
+        <ThemeProvider>
+            <SafeAreaProvider>
+                <NavigationContainer>
+                    <StatusBar style="auto" />
+                    <Stack.Navigator
+                        screenOptions={{
+                            headerTitle: () => <LogoTitle />,
+                            headerTitleAlign: 'center',
+                            headerStyle: {
+                                backgroundColor: 'white',
+                            },
+                            headerShadowVisible: true,
                             animation: 'slide_from_right',
+                            animationTypeForReplace: 'push',
+                            gestureEnabled: true,
+                            gestureDirection: 'horizontal',
                         }}
-                    />
-                    <Stack.Screen
-                        name="ReplayDetail"
-                        component={ReplayDetailScreen}
-                        options={{
-                            headerTitle: "Replay",
-                            headerShown: true,
-                            animation: 'slide_from_right',
-                            headerRight: () => (
-                                <TouchableOpacity
-                                    onPress={() => console.log('Cast button pressed')}
-                                >
-                                    <Cast size={24} />
-                                </TouchableOpacity>
-                            ),
-                        }}
-                    />
-                </Stack.Navigator>
-            </NavigationContainer>
-        </SafeAreaProvider>
+                    >
+                        <Stack.Screen
+                            name="Login"
+                            component={LoginScreen}
+                            options={{
+                                headerShown: false,
+                            }}
+                        />
+                        <Stack.Screen
+                            name="Home"
+                            component={HomeScreen}
+                            options={{
+                                headerTitle: "Home",
+                                headerLeft: () => null,
+                                headerBackVisible: false,
+                                gestureEnabled: false,
+                            }}
+                        />
+                        <Stack.Screen
+                            name="Livestream"
+                            component={LivestreamScreen}
+                            options={{
+                                headerShown: true,
+                                headerBackTitle: "Leave",
+                                headerRight: () => (
+                                    <TouchableOpacity
+                                        onPress={() => console.log('Cast button pressed')}
+                                    >
+                                        <Cast size={24} />
+                                    </TouchableOpacity>
+                                ),
+                            }}
+                        />
+                        <Stack.Screen
+                            name="ViewersList"
+                            component={ViewersListScreen}
+                            options={{
+                                presentation: 'modal',
+                                headerShown: false,
+                                animation: 'slide_from_bottom',
+                            }}
+                        />
+                        <Stack.Screen
+                            name="LiveReplay"
+                            component={LiveReplayScreen}
+                            options={{
+                                headerTitle: "Live Replay",
+                                headerBackTitle: "Back",
+                                headerShown: true,
+                                animation: 'slide_from_right',
+                            }}
+                        />
+                        <Stack.Screen
+                            name="ReplayDetail"
+                            component={ReplayDetailScreen}
+                            options={{
+                                headerTitle: "Replay",
+                                headerShown: true,
+                                animation: 'slide_from_right',
+                                headerRight: () => (
+                                    <TouchableOpacity
+                                        onPress={() => console.log('Cast button pressed')}
+                                    >
+                                        <Cast size={24} />
+                                    </TouchableOpacity>
+                                ),
+                            }}
+                        />
+                    </Stack.Navigator>
+                </NavigationContainer>
+            </SafeAreaProvider>
+        </ThemeProvider>
     );
 } 

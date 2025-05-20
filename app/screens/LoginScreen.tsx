@@ -4,6 +4,7 @@ import { Platform, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, Vie
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { RootStackParamList } from '../../App';
 import { globalStyles, loginStyles } from '../styles/screens.styles';
+import { useTheme } from '../theme/ThemeContext';
 
 type LoginScreenProps = {
     navigation: NativeStackNavigationProp<RootStackParamList, 'Login'>;
@@ -12,6 +13,8 @@ type LoginScreenProps = {
 export default function LoginScreen({ navigation }: LoginScreenProps) {
     const [name, setName] = useState('');
     const [password, setPassword] = useState('');
+    const { theme } = useTheme();
+    
 
     const handleLogin = () => {
         // TODO: Implement actual login logic

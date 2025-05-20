@@ -1,11 +1,12 @@
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ArrowUp, EyeIcon } from 'lucide-react-native';
-import React, { useRef, useState } from 'react';
+import React, { useContext, useRef, useState } from 'react';
 import { FlatList, KeyboardAvoidingView, Platform, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { RootStackParamList } from '../../App';
 import { commentStyles, globalStyles, videoStyles } from '../styles/screens.styles';
-import { colors } from '../theme/colors';
+import { ColorContext } from '../theme/colors';
+
 
 type LivestreamScreenProps = {
     navigation: NativeStackNavigationProp<RootStackParamList, 'Livestream'>;
@@ -26,6 +27,7 @@ type Comment = {
 };
 
 export default function LivestreamScreen({ navigation }: LivestreamScreenProps) {
+    const colors = useContext(ColorContext);
     // Comment Input Value
     const [comment, setComment] = useState('');
 

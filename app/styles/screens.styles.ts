@@ -1,8 +1,11 @@
 import { StyleSheet } from 'react-native';
 import { colors } from '../theme/colors';
-import { commonStyles } from '../theme/common.styles';
+import { commonStyles as commonStylesFunc} from '../theme/common.styles';
 import { layout, spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
+import { ThemeContext, ThemeProvider } from '@react-navigation/native';
+
+const commonStyles = commonStylesFunc(ThemeContext); 
 
 export const globalStyles = StyleSheet.create({
     headerContainer: {
