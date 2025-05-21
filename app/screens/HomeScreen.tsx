@@ -1,6 +1,6 @@
 import { StackActions } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { RootStackParamList } from '../../App';
 import { globalStyles, homeStyles } from '../styles/screens.styles';
@@ -24,7 +24,22 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
         navigation.navigate('LiveReplay');
     };
 
-    const isLive = true; // TODO: Implement API call to check if the business is live
+    const [isLive, setIsLive] = useState(false);
+
+    useEffect(() => {
+        const fetchLivestreamStatus = async () => {
+            try {
+                const response = await fetch('https://api.myfitpro.com/v1/business/993/status');
+                const data = await response.json();
+                setIsLive(data.isLive);
+            } catch (error) {
+                console.error('Failed to fetch livestream status:', error);
+                setIsLive(false);
+            }
+        };
+
+        fetchLivestreamStatus();
+    }, []);
 
     return (
         <View style={globalStyles.container}>
