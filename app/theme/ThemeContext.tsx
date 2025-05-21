@@ -39,27 +39,23 @@ export const useTheme = () => useContext(ThemeContext);
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   const [theme, setTheme] = useState<Theme | null>(null);
 
-  const transformThemeFromAPI = (apiData: any): Theme => ({
-    primary: apiData.light_button_colour,
-    background: apiData.light_background_colour,
-    text: {
-        primary: apiData.light_text_colour,
-        secondary: apiData.light_text_colour,
-    },
-    border: '#DDDDDD',
-    white: '#FFFFFF',
-    live: '#FF0000',
-    logo: apiData.app_icon,
-    banner: apiData.app_logo_light
-  });
-
   useEffect(() => {
     const fetchTheme = async () => {
       try {
-        const res = await axios.get('https://api.myfitpro.com/v1/branded-app/business/993');
-        const transformedTheme = transformThemeFromAPI(res.data);
-        setTheme(transformedTheme);
-        console.log(res.data);
+        const response = await axios.get('https://api.myfitpro.com/v1/branded-app/business/993');
+        setTheme({
+            primary: response.data.light_button_colour,
+            background: response.data.light_background_colour,
+            text: {
+                primary: response.data.light_text_colour,
+                secondary: response.data.light_text_colour,
+            },
+            border: '#DDDDDD',
+            white: '#FFFFFF',
+            live: '#FF0000',
+            logo: response.data.app_icon,
+            banner: response.data.app_logo_light
+      });
       } catch (error) {
         if (axios.isAxiosError(error)) {
             console.error('Theme API error:', {
@@ -67,7 +63,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
               data: error.response?.data,
             });
           } else {
-            console.error('Unknown error loading theme:', error);
+            console.error('erro loading theme:', error);
           }
         setTheme(defaultTheme); 
       }

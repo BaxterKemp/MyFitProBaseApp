@@ -57,22 +57,22 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
 
                 <View style={globalStyles.bottomContent}>
                     <View style={loginStyles.termsContainer}>
-                        <Text style={loginStyles.termsText}>
+                        <Text style={[loginStyles.termsText,{color: theme.text.primary}]}>
                             By continuing you accept our{' '}
-                            <Text style={globalStyles.linkText} onPress={() => console.log('Terms pressed')}> {/* TODO: Add Terms of Service link */}
+                            <Text style={[globalStyles.linkText, {color: theme.text.primary}]} onPress={() => console.log('Terms pressed')}> {/* TODO: Add Terms of Service link */}
                                 terms of service
                             </Text>
                             {' '}and{' '}
-                            <Text style={globalStyles.linkText} onPress={() => console.log('Privacy pressed')}> {/* TODO: Add Privacy Policy link */}
+                            <Text style={[globalStyles.linkText, {color: theme.text.primary}]} onPress={() => console.log('Privacy pressed')}> {/* TODO: Add Privacy Policy link */}
                                 privacy policy
                             </Text>
                         </Text>
                     </View>
 
                     <View style={loginStyles.contactContainer}>
-                        <Text style={loginStyles.termsText}>
+                        <Text style={[loginStyles.termsText, {color: theme.text.primary}]}>
                             Not a member?{' '}
-                            <Text style={globalStyles.linkText} onPress={() => console.log('Contact pressed')}> {/* TODO: Add Contact Us link */}
+                            <Text style={[globalStyles.linkText, {color: theme.text.primary}]} onPress={() => console.log('Contact pressed')}> {/* TODO: Add Contact Us link */}
                                 Contact us
                             </Text>
                         </Text>
