@@ -30,18 +30,29 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
     const [isLive, setIsLive] = useState(false);
 
     useEffect(() => {
-        const fetchLivestreamStatus = async () => {
+        const fetchLivestreamData = async () => {
             try {
-                const response = await fetch('https://api.myfitpro.com/v1/business/993/status');
-                const data = await response.json();
-                setIsLive(data.isLive);
-            } catch (error) {
-                console.error('Failed to fetch livestream status:', error);
+                const token = await AsyncStorage.getItem('Token');
+                const statusRes = await fetch(
+                    'https://api.myfitpro.com/v1/business/993/status',
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            Accept: 'application/json',
+                        },
+                    }
+                );
+                const statusData = await statusRes.json();
+                const live = statusData['is-live'];
+                setIsLive(live);
+            } catch (err) {
+                console.error('Failed to fetch livestream:', err);
                 setIsLive(false);
             }
         };
 
-        fetchLivestreamStatus();
+        const interval = setInterval(fetchLivestreamData, 5000);
+        return () => clearInterval(interval);
     }, []);
 
     return (

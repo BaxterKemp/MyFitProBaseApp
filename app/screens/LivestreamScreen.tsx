@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Image, Text, ActivityIndicator, TextInput, TouchableOpacity, KeyboardAvoidingView, FlatList, Platform } from 'react-native';
+import { View, Image, Text, ActivityIndicator, TextInput, TouchableOpacity, KeyboardAvoidingView, FlatList, Platform, Button } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Video, ResizeMode } from 'expo-av';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -11,6 +11,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '@/App';
 import { RouteProp } from '@react-navigation/native';
 import { ListRenderItemInfo } from 'react-native';
+
 
 type LivestreamScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'Livestream'>;
@@ -60,6 +61,8 @@ export default function LivestreamScreen({ navigation }: LivestreamScreenProps) 
   const [isLoadingComments, setIsLoadingComments] = useState(true);
 
   const flatListRef = useRef<FlatList>(null);
+  const [activeReactionCommentId, setActiveReactionCommentId] = useState<string | null>(null);
+
   const insets = useSafeAreaInsets();
   const { theme } = useTheme();
 
@@ -126,36 +129,37 @@ export default function LivestreamScreen({ navigation }: LivestreamScreenProps) 
 
   // Fetch events/comments
   useEffect(() => {
-    const fetchEvents = async () => {
-      try {
-        setIsLoadingComments(true);
-        const token = await AsyncStorage.getItem('Token');
-        const response = await fetch(
-          'https://api.myfitpro.com/v1/business/993/events',
-          {
-            method: 'GET',
-            headers: {
-              Accept: 'application/json',
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch events');
-        }
-
-        const data = await response.json();
-        setEvents(data);
-      } catch (error) {
-        console.error('Error fetching events:', error);
-      } finally {
-        setIsLoadingComments(false);
-      }
-    };
     const interval = setInterval(fetchEvents, 5000);
     return () => clearInterval(interval);
   }, []);
+
+  const fetchEvents = async () => {
+    try {
+      setIsLoadingComments(true);
+      const token = await AsyncStorage.getItem('Token');
+      const response = await fetch(
+        'https://api.myfitpro.com/v1/business/993/events',
+        {
+          method: 'GET',
+          headers: {
+            Accept: 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch events');
+      }
+
+      const data = await response.json();
+      setEvents(data);
+    } catch (error) {
+      console.error('Error fetching events:', error);
+    } finally {
+      setIsLoadingComments(false);
+    }
+  };
 
   const handleSendComment = async () => {
     if (comment.trim() === '') return;
@@ -188,6 +192,33 @@ export default function LivestreamScreen({ navigation }: LivestreamScreenProps) 
     }
   };
 
+  const handleAddReaction = async (commentId: string, type: string, reactionid: number) => {
+
+    try {
+      const token = await AsyncStorage.getItem('Token');
+      const response = await fetch(
+        `https://api.myfitpro.com/v1/business/993/reactions`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ eventId: commentId, eventType: type, reactionTypeId: reactionid }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to add reaction');
+      }
+      setActiveReactionCommentId(null);
+      fetchEvents();
+    } catch (error) {
+      console.error('Error adding reaction:', error);
+    }
+  };
+
   const handleViewersList = () => {
     navigation.navigate('ViewersList');
   };
@@ -214,80 +245,96 @@ export default function LivestreamScreen({ navigation }: LivestreamScreenProps) 
       }
       <View style={[commentStyles.reactionsContainer, { backgroundColor: theme.background }]}>
         <TouchableOpacity
-          style={[commentStyles.addReactionButton, { backgroundColor: theme.primary }]}
+          style={commentStyles.addReactionButton}
           onPress={() => {
-            // TODO: Implement reaction picker
-            // TODO: Submit reaction to API
+            setActiveReactionCommentId(
+              activeReactionCommentId === item.id ? null : item.id
+            )
           }}
         >
-          <Text style={[commentStyles.addReactionText, { backgroundColor: theme.primary }]}>+</Text>
+          <Text style={commentStyles.addReactionText}>+</Text>
         </TouchableOpacity>
-        {item.reaction_1_count > 0 && (
 
-          <TouchableOpacity
-            style={commentStyles.reactionButton}
-            onPress={() => {
-              // TODO: Submit clicked emoji reaction to API
-            }}
-          >
-            <Text style={commentStyles.reactionText}>
-              {reactionAssets[0].utf8}
-            </Text>
-            <Text style={commentStyles.reactionCount}>{item.reaction_1_count}</Text>
-          </TouchableOpacity>
-        )}
-        {item.reaction_2_count > 0 && (
-          <TouchableOpacity
-            style={commentStyles.reactionButton}
-            onPress={() => {
-              // TODO: Submit clicked emoji reaction to API
-            }}
-          >
-            <Text style={commentStyles.reactionText}>
-              {reactionAssets[1].utf8}
-            </Text>
-            <Text style={commentStyles.reactionCount}>{item.reaction_2_count}</Text>
-          </TouchableOpacity>
-        )}
-        {item.reaction_3_count > 0 && (
-          <TouchableOpacity
-            style={commentStyles.reactionButton}
-            onPress={() => {
-              // TODO: Submit clicked emoji reaction to API
-            }}
-          >
-            <Text style={commentStyles.reactionText}>
-              {reactionAssets[2].utf8}
-            </Text>
-            <Text style={commentStyles.reactionCount}>{item.reaction_3_count}</Text>
-          </TouchableOpacity>
-        )}
-        {item.reaction_4_count > 0 && (
-          <TouchableOpacity
-            style={commentStyles.reactionButton}
-            onPress={() => {
-              // TODO: Submit clicked emoji reaction to API
-            }}
-          >
-            <Text style={commentStyles.reactionText}>
-              {reactionAssets[3].utf8}
-            </Text>
-            <Text style={commentStyles.reactionCount}>{item.reaction_4_count}</Text>
-          </TouchableOpacity>
-        )}
-        {item.reaction_5_count > 0 && (
-          <TouchableOpacity
-            style={[commentStyles.reactionButton, { backgroundColor: theme.primary }]}
-            onPress={() => {
-              // TODO: Submit clicked emoji reaction to API
-            }}
-          >
-            <Text style={commentStyles.reactionText}>
-              {reactionAssets[4].utf8}
-            </Text>
-            <Text style={commentStyles.reactionCount}>{item.reaction_5_count}</Text>
-          </TouchableOpacity>
-        )}
+
+        {activeReactionCommentId === item.id ? (
+          <View style={{
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            borderWidth: 1,
+            borderColor: theme.primary,
+            borderRadius: 10,
+            marginTop: 10,
+          }}>
+            {reactionAssets.map((reaction) => (
+              <TouchableOpacity
+                key={reaction.id}
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', margin: 10, backgroundColor: theme.primary, borderRadius: 10, padding: 5 }}
+                onPress={() => handleAddReaction(item.id, item.type, reaction.id)}
+              >
+                <Text style={commentStyles.reactionText}>{reaction.utf8}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        ) : <View style={commentStyles.reactionsContainer}>
+          {item.reaction_1_count > 0 && (
+
+            <TouchableOpacity
+              style={commentStyles.reactionButton}
+              onPress={() => handleAddReaction(item.id, item.type, 1)}
+            >
+              <Text style={commentStyles.reactionText}>
+                {reactionAssets[0].utf8}
+              </Text>
+              <Text style={commentStyles.reactionCount}>{item.reaction_1_count}</Text>
+            </TouchableOpacity>
+          )}
+          {item.reaction_2_count > 0 && (
+            <TouchableOpacity
+              style={commentStyles.reactionButton}
+              onPress={() => handleAddReaction(item.id, item.type, 2)}
+            >
+              <Text style={commentStyles.reactionText}>
+                {reactionAssets[1].utf8}
+              </Text>
+              <Text style={commentStyles.reactionCount}>{item.reaction_2_count}</Text>
+            </TouchableOpacity>
+          )}
+          {item.reaction_3_count > 0 && (
+            <TouchableOpacity
+              style={commentStyles.reactionButton}
+              onPress={() => handleAddReaction(item.id, item.type, 3)}
+            >
+              <Text style={commentStyles.reactionText}>
+                {reactionAssets[2].utf8}
+              </Text>
+              <Text style={commentStyles.reactionCount}>{item.reaction_3_count}</Text>
+            </TouchableOpacity>
+          )}
+          {item.reaction_4_count > 0 && (
+            <TouchableOpacity
+              style={commentStyles.reactionButton}
+              onPress={() => handleAddReaction(item.id, item.type, 4)}
+            >
+              <Text style={commentStyles.reactionText}>
+                {reactionAssets[3].utf8}
+              </Text>
+              <Text style={commentStyles.reactionCount}>{item.reaction_4_count}</Text>
+            </TouchableOpacity>
+          )}
+          {item.reaction_5_count > 0 && (
+            <TouchableOpacity
+              style={[commentStyles.reactionButton, { backgroundColor: theme.primary }]}
+              onPress={() => handleAddReaction(item.id, item.type, 5)}
+            >
+              <Text style={commentStyles.reactionText}>
+                {reactionAssets[4].utf8}
+              </Text>
+              <Text style={commentStyles.reactionCount}>{item.reaction_5_count}</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+        }
       </View>
     </View>
   );
@@ -376,7 +423,6 @@ export default function LivestreamScreen({ navigation }: LivestreamScreenProps) 
               keyExtractor={item => item.id}
               contentContainerStyle={{ paddingBottom: 10 }}
               onLayout={scrollToBottom}
-              onContentSizeChange={scrollToBottom}
               maintainVisibleContentPosition={{
                 minIndexForVisible: 0,
                 autoscrollToTopThreshold: 100
