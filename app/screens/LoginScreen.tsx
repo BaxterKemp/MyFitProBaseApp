@@ -1,12 +1,13 @@
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useState } from 'react';
-import { Platform, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View, Alert } from 'react-native';
+import { Alert, Image, Platform, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { RootStackParamList } from '../../App';
 import { globalStyles, loginStyles } from '../styles/screens.styles';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import { useTheme } from '../theme/ThemeContext';
 
 type LoginScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'Login'>;
@@ -15,6 +16,8 @@ type LoginScreenProps = {
 export default function LoginScreen({ navigation }: LoginScreenProps) {
   const [name, setName] = useState('');
   const [class_password, setPassword] = useState('');
+  const { theme } = useTheme();
+
   const [business_id, setID] = useState('');
 
   const handleLogin = async () => {
@@ -74,11 +77,11 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
   };
 
   return (
-    <SafeAreaView style={[globalStyles.container, styles.container]}>
-      <View style={globalStyles.headerContainer}>
-        {/* TODO: Add API Logo implementation */}
-      </View>
-
+    <SafeAreaView style={[globalStyles.container, styles.container, { backgroundColor: theme.background }]}>
+      <Image
+        source={{ uri: theme.logo }}
+        style={globalStyles.headerContainer}
+      />
       <View style={globalStyles.mainContent}>
         <View style={globalStyles.formContainer}>
           <TextInput
@@ -100,7 +103,7 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
 
           <TextInput
             style={globalStyles.input}
-            placeholder="Business ID"
+            placeholder="Business ID (TO BE HIDDEN)"
             value={business_id}
             onChangeText={setID}
             secureTextEntry
@@ -108,46 +111,32 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
           />
 
           <TouchableOpacity
-            style={globalStyles.primaryButton}
+            style={[globalStyles.primaryButton, { backgroundColor: theme.primary }]}
             onPress={handleLogin}
           >
             <Text style={globalStyles.primaryButtonText}>Login</Text>
+            {/* [globalStyles.primaryButtonText,{color: theme.text.primary}] */}
           </TouchableOpacity>
         </View>
 
         <View style={globalStyles.bottomContent}>
           <View style={loginStyles.termsContainer}>
-            <Text style={loginStyles.termsText}>
+            <Text style={[loginStyles.termsText, { color: theme.text.primary }]}>
               By continuing you accept our{' '}
-              <Text
-                style={globalStyles.linkText}
-                onPress={() => console.log('Terms pressed')}
-              >
-                {' '}
-                {/* TODO: Add Terms of Service link */}
+              <Text style={[globalStyles.linkText, { color: theme.text.primary }]} onPress={() => console.log('Terms pressed')}> {/* TODO: Add Terms of Service link */}
                 terms of service
-              </Text>{' '}
-              and{' '}
-              <Text
-                style={globalStyles.linkText}
-                onPress={() => console.log('Privacy pressed')}
-              >
-                {' '}
-                {/* TODO: Add Privacy Policy link */}
+              </Text>
+              {' '}and{' '}
+              <Text style={[globalStyles.linkText, { color: theme.text.primary }]} onPress={() => console.log('Privacy pressed')}> {/* TODO: Add Privacy Policy link */}
                 privacy policy
               </Text>
             </Text>
           </View>
 
           <View style={loginStyles.contactContainer}>
-            <Text style={loginStyles.termsText}>
+            <Text style={[loginStyles.termsText, { color: theme.text.primary }]}>
               Not a member?{' '}
-              <Text
-                style={globalStyles.linkText}
-                onPress={() => console.log('Contact pressed')}
-              >
-                {' '}
-                {/* TODO: Add Contact Us link */}
+              <Text style={[globalStyles.linkText, { color: theme.text.primary }]} onPress={() => console.log('Contact pressed')}> {/* TODO: Add Contact Us link */}
                 Contact us
               </Text>
             </Text>

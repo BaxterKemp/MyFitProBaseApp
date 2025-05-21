@@ -1,9 +1,11 @@
 import { StackActions } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useEffect, useState } from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { Image, Text, TouchableOpacity, View } from 'react-native';
 import { RootStackParamList } from '../../App';
 import { globalStyles, homeStyles } from '../styles/screens.styles';
+import { useTheme } from '../theme/ThemeContext';
+import { colors } from '../theme/colors';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type HomeScreenProps = {
@@ -11,6 +13,7 @@ type HomeScreenProps = {
 };
 
 export default function HomeScreen({ navigation }: HomeScreenProps) {
+    const { theme } = useTheme();
     const handleLogout = async () => {
         await AsyncStorage.clear(); // Clear stored token
         navigation.replace('Login'); // Reset stack and go to Login
@@ -42,10 +45,11 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
     }, []);
 
     return (
-        <View style={globalStyles.container}>
-            <View style={globalStyles.headerContainer}>
-                {/* TODO: Add API Logo implementation */}
-            </View>
+        <View style={[globalStyles.container, { backgroundColor: theme.background }]}>
+            <Image
+                source={{ uri: theme.logo }}
+                style={globalStyles.headerContainer}
+            />
 
             {/* Live indicator */}
             {isLive ?
@@ -64,14 +68,14 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
             {/* Main buttons area */}
             <View style={homeStyles.buttonContainer}>
                 <TouchableOpacity
-                    style={[homeStyles.button, homeStyles.mainButton]}
+                    style={[homeStyles.button, homeStyles.mainButton, { backgroundColor: theme.primary }]}
                     onPress={handleLivestream}
                 >
                     <Text style={globalStyles.primaryButtonText}>Live Stream</Text>
                 </TouchableOpacity>
                 {true && ( // TODO: Only show if business has Live Replay enabled
                     <TouchableOpacity
-                        style={[homeStyles.button, homeStyles.mainButton]}
+                        style={[homeStyles.button, homeStyles.mainButton, { backgroundColor: theme.primary }]}
                         onPress={handleLiveReplay}
                     >
                         <Text style={globalStyles.primaryButtonText}>Live Replay</Text>

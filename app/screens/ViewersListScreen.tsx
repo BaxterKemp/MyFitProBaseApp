@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { RootStackParamList } from '../../App';
 import { viewersListStyles } from '../styles/screens.styles';
 import { colors } from '../theme/colors';
+import { useTheme } from '../theme/ThemeContext';
 
 type ViewersListScreenProps = {
     navigation: NativeStackNavigationProp<RootStackParamList, 'ViewersList'>;
@@ -31,28 +32,29 @@ const viewers: Viewer[] = [
 ];
 
 export default function ViewersListScreen({ navigation }: ViewersListScreenProps) {
+    const { theme } = useTheme();
     const handleClose = () => {
         navigation.goBack();
     };
 
     const renderViewerItem = ({ item }: { item: Viewer }) => (
-        <View style={viewersListStyles.viewerItem}>
-            <View style={viewersListStyles.viewerAvatar}>
+        <View style={[viewersListStyles.viewerItem, {backgroundColor: theme.background}]}>
+            <View style={[viewersListStyles.viewerAvatar,{backgroundColor: theme.primary}]}>
                 <Text style={viewersListStyles.viewerInitial}>{item.name.charAt(0)}</Text>
             </View>
-            <Text style={viewersListStyles.viewerName}>{item.name}</Text>
+            <Text style={[viewersListStyles.viewerName,{color: theme.text.primary}]}>{item.name}</Text>
         </View>
     );
 
     return (
-        <SafeAreaView style={viewersListStyles.container} edges={['top', 'left', 'right']}>
+        <SafeAreaView style={[viewersListStyles.container,{backgroundColor: theme.background}]} edges={['top', 'left', 'right']}>
             <View style={viewersListStyles.header}>
-                <Text style={viewersListStyles.title}>Active Viewers</Text>
+                <Text style={[viewersListStyles.title, {color: theme.text.primary}]}>Active Viewers</Text>
                 <TouchableOpacity
                     onPress={handleClose}
                     style={viewersListStyles.closeButton}
                 >
-                    <X size={24} color={colors.text.primary} />
+                    <X size={24} color={theme.text.primary} />
                 </TouchableOpacity>
             </View>
 

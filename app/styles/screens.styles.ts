@@ -1,17 +1,20 @@
 import { StyleSheet } from 'react-native';
 import { colors } from '../theme/colors';
-import { commonStyles } from '../theme/common.styles';
+import { commonStyles as commonStylesFunc} from '../theme/common.styles';
 import { layout, spacing } from '../theme/spacing';
 import { typography } from '../theme/typography';
+import { ThemeContext, ThemeProvider } from '@react-navigation/native';
+
+const commonStyles = commonStylesFunc(colors); 
 
 export const globalStyles = StyleSheet.create({
     headerContainer: {
         ...commonStyles.centerAligned,
         height: 159,
-        backgroundColor: 'lightgray', // TODO: remove this once the API Logo implementation is complete
         marginTop: spacing.lg,
         marginBottom: spacing.xxxl,
         marginHorizontal: spacing.lg,
+        resizeMode: 'contain'
     },
     container: {
         ...commonStyles.container,

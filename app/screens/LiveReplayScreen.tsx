@@ -14,6 +14,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { RootStackParamList } from '../../App';
 import { liveReplayStyles } from '../styles/screens.styles';
 import { colors } from '../theme/colors';
+import { useTheme } from '../theme/ThemeContext';
 
 type LiveReplayScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'LiveReplay'>;
@@ -34,6 +35,7 @@ export default function LiveReplayScreen({
 }: LiveReplayScreenProps) {
   const [replays, setReplays] = useState<ReplayVideo[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const { theme } = useTheme();
 
   useEffect(() => {
     const fetchReplays = async () => {
@@ -94,7 +96,7 @@ export default function LiveReplayScreen({
 
   const renderReplayItem = ({ item }: { item: ReplayVideo }) => (
     <TouchableOpacity
-      style={liveReplayStyles.replayItem}
+      style={[liveReplayStyles.replayItem, { backgroundColor: theme.background }]}
       onPress={() =>
         navigation.navigate('ReplayDetail', {
           replayData: {
@@ -114,19 +116,19 @@ export default function LiveReplayScreen({
         resizeMode="cover"
       />
       <View style={liveReplayStyles.contentContainer}>
-        <Text style={liveReplayStyles.title}>{item.title}</Text>
-        <Text style={liveReplayStyles.subText}>
+        <Text style={[liveReplayStyles.title, { color: theme.text.primary }]}>{item.title}</Text>
+        <Text style={[liveReplayStyles.subText, { color: theme.text.primary }]}>
           {formatDuration(item.length)}
         </Text>
       </View>
-      <View style={liveReplayStyles.playButton}>
+      <View style={[liveReplayStyles.playButton, { backgroundColor: theme.primary }]}>
         <Play size={20} color={colors.white} />
       </View>
     </TouchableOpacity>
   );
 
   return (
-    <SafeAreaView style={liveReplayStyles.container} edges={['left', 'right']}>
+    <SafeAreaView style={[liveReplayStyles.container, { backgroundColor: theme.background }]} edges={['left', 'right']}>
       {isLoading ? (
         <Text style={{ textAlign: 'center', marginTop: 20 }}>Loading...</Text>
       ) : (

@@ -1,5 +1,5 @@
 export const colors = {
-    primary: '#007AFF',
+    primary: '#000000',
     background: '#FFFFFF',
     text: {
         primary: '#000000',
@@ -8,4 +8,7 @@ export const colors = {
     border: '#DDDDDD',
     white: '#FFFFFF',
     live: '#FF0000',
-} as const; 
+};  
+
+
+
