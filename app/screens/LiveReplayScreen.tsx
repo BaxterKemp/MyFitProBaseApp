@@ -35,6 +35,7 @@ export default function LiveReplayScreen({
 }: LiveReplayScreenProps) {
   const [replays, setReplays] = useState<ReplayVideo[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const { theme } = useTheme();
 
   useEffect(() => {
     const fetchReplays = async () => {
@@ -95,7 +96,7 @@ export default function LiveReplayScreen({
 
   const renderReplayItem = ({ item }: { item: ReplayVideo }) => (
     <TouchableOpacity
-      style={liveReplayStyles.replayItem}
+      style={[liveReplayStyles.replayItem, { backgroundColor: theme.background }]}
       onPress={() =>
         navigation.navigate('ReplayDetail', {
           replayData: {
@@ -115,82 +116,29 @@ export default function LiveReplayScreen({
         resizeMode="cover"
       />
       <View style={liveReplayStyles.contentContainer}>
-        <Text style={liveReplayStyles.title}>{item.title}</Text>
-        <Text style={liveReplayStyles.subText}>
+        <Text style={[liveReplayStyles.title, { color: theme.text.primary }]}>{item.title}</Text>
+        <Text style={[liveReplayStyles.subText, { color: theme.text.primary }]}>
           {formatDuration(item.length)}
         </Text>
       </View>
-      <View style={liveReplayStyles.playButton}>
+      <View style={[liveReplayStyles.playButton, { backgroundColor: theme.primary }]}>
         <Play size={20} color={colors.white} />
       </View>
     </TouchableOpacity>
   );
-  // Sample replay data - replace with real data from API
-  const replayData = [
-    {
-      id: '1',
-      title: 'Morning Cardio Session',
-      thumbnail: 'https://via.placeholder.com/120x80',
-      timeAgo: '1 day ago',
-      duration: '57 mins'
-    },
-    {
-      id: '2',
-      title: 'HIIT Workout Challenge',
-      thumbnail: 'https://via.placeholder.com/120x80',
-      timeAgo: '3 days ago',
-      duration: '45 mins'
-    },
-    {
-      id: '3',
-      title: 'Yoga for Beginners',
-      thumbnail: 'https://via.placeholder.com/120x80',
-      timeAgo: '1 week ago',
-      duration: '62 mins'
-    },
-    {
-      id: '4',
-      title: 'Full Body Strength Training',
-      thumbnail: 'https://via.placeholder.com/120x80',
-      timeAgo: '2 weeks ago',
-      duration: '50 mins'
-    }
-  ];
 
-  export default function LiveReplayScreen({ navigation }: LiveReplayScreenProps) {
-    const { theme } = useTheme();
-    const renderReplayItem = ({ item }: { item: typeof replayData[0] }) => (
-      <TouchableOpacity
-        style={[liveReplayStyles.replayItem, { backgroundColor: theme.background }]}
-        onPress={() => navigation.navigate('ReplayDetail', { replayData: item })}
-      >
-        <Image
-          source={{ uri: item.thumbnail }}
-          style={liveReplayStyles.thumbnail}
-          resizeMode="cover"
+  return (
+    <SafeAreaView style={[liveReplayStyles.container, { backgroundColor: theme.background }]} edges={['left', 'right']}>
+      {isLoading ? (
+        <Text style={{ textAlign: 'center', marginTop: 20 }}>Loading...</Text>
+      ) : (
+        <FlatList
+          data={replays}
+          renderItem={renderReplayItem}
+          keyExtractor={(item) => item.uuid}
+          contentContainerStyle={liveReplayStyles.listContent}
         />
-        <View style={liveReplayStyles.contentContainer}>
-          <Text style={[liveReplayStyles.title, { color: theme.text.primary }]}>{item.title}</Text>
-          <Text style={[liveReplayStyles.subText, { color: theme.text.primary }]}>{`${item.timeAgo} - ${item.duration}`}</Text>
-        </View>
-        <View style={[liveReplayStyles.playButton, { backgroundColor: theme.primary }]}>
-          <Play size={20} color={colors.white} />
-        </View>
-      </TouchableOpacity>
-    );
-
-    return (
-      <SafeAreaView style={[liveReplayStyles.container, { backgroundColor: theme.background }]} edges={['left', 'right']}>
-        {isLoading ? (
-          <Text style={{ textAlign: 'center', marginTop: 20 }}>Loading...</Text>
-        ) : (
-          <FlatList
-            data={replays}
-            renderItem={renderReplayItem}
-            keyExtractor={(item) => item.uuid}
-            contentContainerStyle={liveReplayStyles.listContent}
-          />
-        )}
-      </SafeAreaView>
-    );
-  }
+      )}
+    </SafeAreaView>
+  );
+}

@@ -1,128 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, ActivityIndicator, TextInput, TouchableOpacity, KeyboardAvoidingView, FlatList, Platform } from 'react-native';
+import { View, Image, Text, ActivityIndicator, TextInput, TouchableOpacity, KeyboardAvoidingView, FlatList, Platform } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Video, ResizeMode } from 'expo-av';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { commentStyles, globalStyles, videoStyles } from '../styles/screens.styles';
+import { commentStyles, globalStyles, homeStyles, videoStyles } from '../styles/screens.styles';
 import { ArrowUp, EyeIcon } from 'lucide-react-native';
 import { colors } from '../theme/colors';
 import { useTheme } from '../theme/ThemeContext';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '@/App';
 import { RouteProp } from '@react-navigation/native';
-
 import { ListRenderItemInfo } from 'react-native';
-// type LivestreamData = {
-//   stream_url: string;
-//   title: string;
-//   viewer_count: number;
-// };
-
-// export default function LivestreamScreen() {
-//   const [streamData, setStreamData] = useState<LivestreamData | null>(null);
-//   const [isLoading, setIsLoading] = useState(true);
-//   const [isLive, setIsLive] = useState(false);
-
-//   useEffect(() => {
-//     const fetchLivestreamData = async () => {
-//       setIsLoading(true);
-//       try {
-//         const token = await AsyncStorage.getItem('Token');
-//         const statusRes = await fetch(
-//           'https://api.myfitpro.com/v1/business/993/status',
-//           {
-//             headers: {
-//               Authorization: `Bearer ${token}`,
-//               Accept: 'application/json',
-//             },
-//           }
-//         );
-//         const statusData = await statusRes.json();
-//         const live = statusData['is-live'];
-//         setIsLive(live);
-
-//         if (live) {
-//           const detailsRes = await fetch(
-//             'https://api.myfitpro.com/v1/business/993',
-//             {
-//               headers: {
-//                 Authorization: `Bearer ${token}`,
-//                 Accept: 'application/json',
-//               },
-//             }
-//           );
-//           const detailsData = await detailsRes.json();
-
-//           setStreamData({
-//             stream_url: detailsData.stream_url,
-//             title: detailsData.name,
-//             viewer_count: detailsData.viewer_count ?? 0,
-//           });
-//         } else {
-//           setStreamData(null);
-//         }
-//       } catch (err) {
-//         console.error('Failed to fetch livestream:', err);
-//         setStreamData(null);
-//       } finally {
-//         setIsLoading(false);
-//       }
-//     };
-
-//     fetchLivestreamData();
-//   }, []);
-
-//   if (isLoading) {
-//     return (
-//       <SafeAreaView>
-//         <ActivityIndicator size="large" />
-//       </SafeAreaView>
-//     );
-//   }
-
-//   if (!isLive) {
-//     return (
-//       <SafeAreaView>
-//         <Text style={{ textAlign: 'center', marginTop: 40 }}>
-//           Not currently live.
-//         </Text>
-//       </SafeAreaView>
-//     );
-//   }
-
-//   if (!streamData?.stream_url) {
-//     return (
-//       <SafeAreaView>
-//         <Text style={{ textAlign: 'center', marginTop: 40 }}>
-//           Stream URL not available.
-//         </Text>
-//       </SafeAreaView>
-//     );
-//   }
-
-//   return (
-//     <SafeAreaView style={{ flex: 1 }}>
-//       <View
-//         style={{ width: '100%', aspectRatio: 16 / 9, backgroundColor: 'black' }}
-//       >
-//         <Video
-//           source={{ uri: streamData.stream_url }}
-//           useNativeControls
-//           resizeMode={ResizeMode.CONTAIN}
-//           style={{ width: '100%', height: '100%' }}
-//           shouldPlay
-//           onError={(e) => console.log('Video error:', e)}
-//         />
-//       </View>
-//       <View style={{ padding: 16 }}>
-//         <Text style={{ fontSize: 18, fontWeight: 'bold' }}>
-//           {streamData.title}
-//         </Text>
-//         <Text style={{ color: 'gray' }}>{streamData.viewer_count} viewers</Text>
-//       </View>
-//     </SafeAreaView>
-//   );
-// }
 
 type LivestreamScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'Livestream'>;
@@ -160,10 +48,10 @@ const reactionAssets: reactionAsset[] = [
   { id: 4, name: "sweat", utf8: "😅" },
   { id: 5, name: "medal", utf8: "🏅" }
 ];
+
 export default function LivestreamScreen({ navigation }: LivestreamScreenProps) {
 
   const [comment, setComment] = useState('');
-  const { theme } = useTheme();
 
   const [isLive, setIsLive] = useState(false);
   const [streamData, setStreamData] = useState<LivestreamData | null>(null);
@@ -173,6 +61,7 @@ export default function LivestreamScreen({ navigation }: LivestreamScreenProps) 
 
   const flatListRef = useRef<FlatList>(null);
   const insets = useSafeAreaInsets();
+  const { theme } = useTheme();
 
   // Fetch livestream status
   useEffect(() => {
@@ -405,10 +294,17 @@ export default function LivestreamScreen({ navigation }: LivestreamScreenProps) 
 
   if (!isLive) {
     return (
-      <SafeAreaView>
-        <Text style={{ textAlign: 'center', marginTop: 40 }}>
-          Not currently live.
-        </Text>
+      <SafeAreaView edges={['bottom']}>
+        <Image
+          source={{ uri: theme.banner }}
+          style={[{ marginHorizontal: 0, marginTop: 0, marginBottom: 20, width: '100%', height: 275, backgroundColor: 'black' }]}
+          resizeMode="center"
+        />
+        <View style={[homeStyles.liveButtonContainer, { alignItems: 'flex-start', margin: 10 }]}>
+          <View style={homeStyles.offlineIndicator}>
+            <Text style={homeStyles.offlineText}>OFFLINE</Text>
+          </View>
+        </View>
       </SafeAreaView>
     );
   }
@@ -515,6 +411,7 @@ export default function LivestreamScreen({ navigation }: LivestreamScreenProps) 
               </TouchableOpacity>
             </View>
           </View>
+        </View>
       </SafeAreaView>
     </KeyboardAvoidingView >
   );

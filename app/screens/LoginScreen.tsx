@@ -1,6 +1,6 @@
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useState } from 'react';
-import { Image, Platform, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, Image, Platform, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { RootStackParamList } from '../../App';
 import { globalStyles, loginStyles } from '../styles/screens.styles';
@@ -103,7 +103,7 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
 
           <TextInput
             style={globalStyles.input}
-            placeholder="Business ID"
+            placeholder="Business ID (TO BE HIDDEN)"
             value={business_id}
             onChangeText={setID}
             secureTextEntry

@@ -1,7 +1,7 @@
 import { StackActions } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useEffect, useState } from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { Image, Text, TouchableOpacity, View } from 'react-native';
 import { RootStackParamList } from '../../App';
 import { globalStyles, homeStyles } from '../styles/screens.styles';
 import { useTheme } from '../theme/ThemeContext';
@@ -46,9 +46,10 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
 
     return (
         <View style={[globalStyles.container, { backgroundColor: theme.background }]}>
-            <View style={globalStyles.headerContainer}>
-                {/* TODO: Add API Logo implementation */}
-            </View>
+            <Image
+                source={{ uri: theme.logo }}
+                style={globalStyles.headerContainer}
+            />
 
             {/* Live indicator */}
             {isLive ?
