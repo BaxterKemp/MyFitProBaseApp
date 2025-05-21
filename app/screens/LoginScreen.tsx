@@ -1,20 +1,12 @@
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useState } from 'react';
-import {
-  Platform,
-  StatusBar,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-  Alert,
-} from 'react-native';
+import { Platform, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { RootStackParamList } from '../../App';
 import { globalStyles, loginStyles } from '../styles/screens.styles';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 type LoginScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'Login'>;
@@ -57,29 +49,25 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
 
       if (data.token) {
         await AsyncStorage.setItem('Token', data.token);
-        console.log('This is token data: ' + data.token);
+        console.log("This is token data: " + data.token);
 
         // Optional: Store more for future use
-        await AsyncStorage.setItem(
-          'LoginInfo',
-          JSON.stringify({
-            name: data.name,
-            login_id: data.login_id,
-            business_id: data.business_id,
-            business_slug: data.business_slug,
-            expires_at: data.expires_at,
-          })
-        );
+        await AsyncStorage.setItem('LoginInfo', JSON.stringify({
+          name: data.name,
+          login_id: data.login_id,
+          business_id: data.business_id,
+          business_slug: data.business_slug,
+          expires_at: data.expires_at
+        }));
 
         console.log('Login successful:', data.message);
         navigation.replace('Home'); // Navigate to homepage
       } else {
         Alert.alert('Login Failed', 'No token received from server.');
       }
+
     } catch (error: any) {
-      const message =
-        error?.response?.data?.message ||
-        'Login failed. Please check your credentials.';
+      const message = error?.response?.data?.message || 'Login failed. Please check your credentials.';
       console.error('Login error:', message);
       Alert.alert('Login Failed', message);
     }

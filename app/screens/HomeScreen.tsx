@@ -11,10 +11,9 @@ type HomeScreenProps = {
 };
 
 export default function HomeScreen({ navigation }: HomeScreenProps) {
-    const handleLogout = () => {
-        AsyncStorage.setItem('Token', '');
-        AsyncStorage.setItem('LoginInfo', '');
-        navigation.replace('Login');
+    const handleLogout = async () => {
+        await AsyncStorage.clear(); // Clear stored token
+        navigation.replace('Login'); // Reset stack and go to Login
     };
 
     const handleLivestream = () => {
