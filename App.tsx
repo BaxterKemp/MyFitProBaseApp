@@ -71,7 +71,7 @@ export default function App() {
                             headerTitle: () => <LogoTitle />,
                             headerTitleAlign: 'center',
                             headerStyle: {
-                                backgroundColor: 'white',
+                                backgroundColor: theme.background,
                             },
                             headerShadowVisible: true,
                             animation: 'slide_from_right',
