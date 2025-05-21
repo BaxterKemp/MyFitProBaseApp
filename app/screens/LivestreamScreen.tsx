@@ -1,234 +1,521 @@
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { ArrowUp, EyeIcon } from 'lucide-react-native';
-import React, { useRef, useState } from 'react';
-import { FlatList, KeyboardAvoidingView, Platform, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, Text, ActivityIndicator, TextInput, TouchableOpacity, KeyboardAvoidingView, FlatList, Platform } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { RootStackParamList } from '../../App';
+import { Video, ResizeMode } from 'expo-av';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { commentStyles, globalStyles, videoStyles } from '../styles/screens.styles';
+import { ArrowUp, EyeIcon } from 'lucide-react-native';
 import { colors } from '../theme/colors';
 import { useTheme } from '../theme/ThemeContext';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '@/App';
+import { RouteProp } from '@react-navigation/native';
+
+import { ListRenderItemInfo } from 'react-native';
+// type LivestreamData = {
+//   stream_url: string;
+//   title: string;
+//   viewer_count: number;
+// };
+
+// export default function LivestreamScreen() {
+//   const [streamData, setStreamData] = useState<LivestreamData | null>(null);
+//   const [isLoading, setIsLoading] = useState(true);
+//   const [isLive, setIsLive] = useState(false);
+
+//   useEffect(() => {
+//     const fetchLivestreamData = async () => {
+//       setIsLoading(true);
+//       try {
+//         const token = await AsyncStorage.getItem('Token');
+//         const statusRes = await fetch(
+//           'https://api.myfitpro.com/v1/business/993/status',
+//           {
+//             headers: {
+//               Authorization: `Bearer ${token}`,
+//               Accept: 'application/json',
+//             },
+//           }
+//         );
+//         const statusData = await statusRes.json();
+//         const live = statusData['is-live'];
+//         setIsLive(live);
+
+//         if (live) {
+//           const detailsRes = await fetch(
+//             'https://api.myfitpro.com/v1/business/993',
+//             {
+//               headers: {
+//                 Authorization: `Bearer ${token}`,
+//                 Accept: 'application/json',
+//               },
+//             }
+//           );
+//           const detailsData = await detailsRes.json();
+
+//           setStreamData({
+//             stream_url: detailsData.stream_url,
+//             title: detailsData.name,
+//             viewer_count: detailsData.viewer_count ?? 0,
+//           });
+//         } else {
+//           setStreamData(null);
+//         }
+//       } catch (err) {
+//         console.error('Failed to fetch livestream:', err);
+//         setStreamData(null);
+//       } finally {
+//         setIsLoading(false);
+//       }
+//     };
+
+//     fetchLivestreamData();
+//   }, []);
+
+//   if (isLoading) {
+//     return (
+//       <SafeAreaView>
+//         <ActivityIndicator size="large" />
+//       </SafeAreaView>
+//     );
+//   }
+
+//   if (!isLive) {
+//     return (
+//       <SafeAreaView>
+//         <Text style={{ textAlign: 'center', marginTop: 40 }}>
+//           Not currently live.
+//         </Text>
+//       </SafeAreaView>
+//     );
+//   }
+
+//   if (!streamData?.stream_url) {
+//     return (
+//       <SafeAreaView>
+//         <Text style={{ textAlign: 'center', marginTop: 40 }}>
+//           Stream URL not available.
+//         </Text>
+//       </SafeAreaView>
+//     );
+//   }
+
+//   return (
+//     <SafeAreaView style={{ flex: 1 }}>
+//       <View
+//         style={{ width: '100%', aspectRatio: 16 / 9, backgroundColor: 'black' }}
+//       >
+//         <Video
+//           source={{ uri: streamData.stream_url }}
+//           useNativeControls
+//           resizeMode={ResizeMode.CONTAIN}
+//           style={{ width: '100%', height: '100%' }}
+//           shouldPlay
+//           onError={(e) => console.log('Video error:', e)}
+//         />
+//       </View>
+//       <View style={{ padding: 16 }}>
+//         <Text style={{ fontSize: 18, fontWeight: 'bold' }}>
+//           {streamData.title}
+//         </Text>
+//         <Text style={{ color: 'gray' }}>{streamData.viewer_count} viewers</Text>
+//       </View>
+//     </SafeAreaView>
+//   );
+// }
 
 type LivestreamScreenProps = {
-    navigation: NativeStackNavigationProp<RootStackParamList, 'Livestream'>;
+  navigation: NativeStackNavigationProp<RootStackParamList, 'Livestream'>;
 };
 
-// Comment type definition
-type Reaction = {
-    type: string;
-    count: number;
+type LivestreamData = {
+  stream_url: string;
+  title: string;
+  viewer_count: number;
 };
 
-type Comment = {
-    id: string;
-    userName: string;
-    text: string;
-    timestamp: string;
-    reactions: Reaction[];
+type Event = {
+  id: string;
+  created_at: string;
+  type: string;
+  name: string;
+  body: string;
+  reaction_1_count: number;
+  reaction_2_count: number;
+  reaction_3_count: number;
+  reaction_4_count: number;
+  reaction_5_count: number;
 };
 
+type reactionAsset = {
+  id: number;
+  name: string;
+  utf8: string;
+};
+
+const reactionAssets: reactionAsset[] = [
+  { id: 1, name: "love", utf8: "❤️" },
+  { id: 2, name: "like", utf8: "👍" },
+  { id: 3, name: "strong", utf8: "💪" },
+  { id: 4, name: "sweat", utf8: "😅" },
+  { id: 5, name: "medal", utf8: "🏅" }
+];
 export default function LivestreamScreen({ navigation }: LivestreamScreenProps) {
-    // Comment Input Value
-    const [comment, setComment] = useState('');
-    const { theme } = useTheme();
 
-    const flatListRef = useRef<FlatList>(null);
+  const [comment, setComment] = useState('');
+  const { theme } = useTheme();
 
-    const insets = useSafeAreaInsets();
+  const [isLive, setIsLive] = useState(false);
+  const [streamData, setStreamData] = useState<LivestreamData | null>(null);
 
-    const isLive = true; // TODO: Implement API call to check if the business is live
-    const viewerCount = 8; // TODO: Replace with API data
+  const [events, setEvents] = useState<Event[]>([]);
+  const [isLoadingComments, setIsLoadingComments] = useState(true);
 
-    // Comment Data TODO: Replace with API data
-    const comments: Comment[] = [
-        {
-            id: '1',
-            userName: 'John',
-            text: 'This is awesome!',
-            timestamp: '2:30 PM',
-            reactions: [
-                { type: '😊', count: 3 },
-                { type: '❤️', count: 2 }
-            ]
-        },
-        {
-            id: '2',
-            userName: 'Sarah',
-            text: 'Great session today! Loved the content.',
-            timestamp: '2:32 PM',
-            reactions: [
-                { type: '😊', count: 1 },
-                { type: '❤️', count: 3 },
-                { type: '💪', count: 2 }
-            ]
-        },
-        {
-            id: '3',
-            userName: 'Mike',
-            text: 'When is the next session?',
-            timestamp: '2:35 PM',
-            reactions: []
-        },
-        {
-            id: '4',
-            userName: 'Emma',
-            text: 'Could you please explain that last part again?',
-            timestamp: '2:37 PM',
-            reactions: [
-                { type: '👍', count: 1 }
-            ]
-        },
-        {
-            id: '5',
-            userName: 'David',
-            text: 'Thanks for the tips!',
-            timestamp: '2:39 PM',
-            reactions: [
-                { type: '🙏', count: 4 }
-            ]
+  const flatListRef = useRef<FlatList>(null);
+  const insets = useSafeAreaInsets();
+
+  // Fetch livestream status
+  useEffect(() => {
+    const fetchLivestreamData = async () => {
+      try {
+        const token = await AsyncStorage.getItem('Token');
+        const statusRes = await fetch(
+          'https://api.myfitpro.com/v1/business/993/status',
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              Accept: 'application/json',
+            },
+          }
+        );
+        const statusData = await statusRes.json();
+        const live = statusData['is-live'];
+        setIsLive(live);
+      } catch (err) {
+        console.error('Failed to fetch livestream:', err);
+        setStreamData(null);
+      }
+    };
+
+    const interval = setInterval(fetchLivestreamData, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Fetch livestream data
+  useEffect(() => {
+    const fetchStreamStatus = async () => {
+      try {
+        const token = await AsyncStorage.getItem('Token');
+        if (isLive) {
+          const detailsRes = await fetch(
+            'https://api.myfitpro.com/v1/business/993',
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                Accept: 'application/json',
+              },
+            }
+          );
+          const detailsData = await detailsRes.json();
+
+          setStreamData({
+            stream_url: detailsData.stream_url,
+            title: detailsData.name,
+            viewer_count: detailsData.viewer_count ?? 0,
+          });
+        } else {
+          setStreamData(null);
         }
-    ]
+      } catch (err) {
+        console.error('Failed to fetch livestream:', err);
+        setStreamData(null);
+      }
 
-    const handleViewersList = () => {
-        navigation.navigate('ViewersList');
-    };
+    }
+    fetchStreamStatus();
+  }, [isLive]);
 
-    const handleSendComment = () => {
-        if (comment.trim() === '') return;
+  // Fetch events/comments
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        setIsLoadingComments(true);
+        const token = await AsyncStorage.getItem('Token');
+        const response = await fetch(
+          'https://api.myfitpro.com/v1/business/993/events',
+          {
+            method: 'GET',
+            headers: {
+              Accept: 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
-        // Instead of adding the comment, just log to console
-        console.log('Comment submitted:', comment);
-
-        // Clear the input field
-        setComment('');
-    };
-
-    // Scroll to bottom of the comments list
-    const scrollToBottom = () => {
-        if (comments.length > 0 && flatListRef.current) {
-            flatListRef.current.scrollToEnd({ animated: false });
+        if (!response.ok) {
+          throw new Error('Failed to fetch events');
         }
+
+        const data = await response.json();
+        setEvents(data);
+      } catch (error) {
+        console.error('Error fetching events:', error);
+      } finally {
+        setIsLoadingComments(false);
+      }
     };
+    const interval = setInterval(fetchEvents, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
-    // Comment Item Renderer
-    const renderComment = ({ item }: { item: Comment }) => (
-        <View style={[commentStyles.commentItem, {backgroundColor: theme.background}]}>
-            <View style={[commentStyles.commentHeader,{backgroundColor: theme.background}]}>
-                <Text style={[commentStyles.userName, {color: theme.text.primary }]}>{item.userName}</Text>
-                <Text style={[commentStyles.timestamp, {color: theme.text.primary }]}>{item.timestamp}</Text>
-            </View>
-            <Text style={[commentStyles.commentText,{color: theme.text.primary}]}>{item.text}</Text>
-            <View style={[commentStyles.reactionsContainer, {backgroundColor: theme.background}]}>
-                <TouchableOpacity
-                    style={[commentStyles.addReactionButton, {backgroundColor: theme.primary}]}
-                    onPress={() => {
-                        // TODO: Implement reaction picker
-                        // TODO: Submit reaction to API
-                    }}
-                >
-                    <Text style={[commentStyles.addReactionText, {backgroundColor: theme.primary}]}>+</Text>
-                </TouchableOpacity>
-                {item.reactions.map((reaction, index) => (
-                    <TouchableOpacity
-                        key={index}
-                        style={[commentStyles.reactionButton,{backgroundColor: theme.primary}]}
-                        onPress={() => {
-                            // TODO: Submit clicked emoji reaction to API
-                        }}
-                    >
-                        <Text style={commentStyles.reactionText}>{reaction.type}</Text>
-                        <Text style={commentStyles.reactionCount}>{reaction.count}</Text>
-                    </TouchableOpacity>
-                ))}
-            </View>
-        </View>
-    );
+  const handleSendComment = async () => {
+    if (comment.trim() === '') return;
 
-    // Page Renderer
-    return (
-        <KeyboardAvoidingView
-            style={{ flex: 1 }}
-            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-            keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}
+    const form = new FormData();
+    form.append('body', comment);
+
+    try {
+      const token = await AsyncStorage.getItem('Token');
+      const response = await fetch('https://api.myfitpro.com/v1/business/993/comments', {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: form,
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send comment');
+      }
+
+      const data = await response.json();
+      console.log('Comment posted:', data);
+
+      setComment('');
+    }
+    catch (error) {
+      console.error('Error sending comment:', error);
+    }
+  };
+
+  const handleViewersList = () => {
+    navigation.navigate('ViewersList');
+  };
+
+  // Scroll to bottom of the comments list
+  const scrollToBottom = () => {
+    if (events.length > 0 && flatListRef.current) {
+      flatListRef.current.scrollToEnd({ animated: false });
+    }
+  };
+
+  const renderEvent = ({ item }: ListRenderItemInfo<Event>) => (
+    <View style={[commentStyles.commentItem, { backgroundColor: theme.background }]}>
+      <View style={[commentStyles.commentHeader, { backgroundColor: theme.background }]}>
+        {item.type === 'login' ? (
+          <Text style={[commentStyles.userName, { color: theme.text.primary }]}>{item.name + " Logged in"}</Text>
+        ) : <Text style={commentStyles.userName}>{item.name}</Text>
+        }
+        <Text style={[commentStyles.timestamp, { color: theme.text.primary }]}>{item.created_at}</Text>
+      </View>
+      {item.type === 'comment' ? (
+        <Text style={[commentStyles.commentText, { color: theme.text.primary }]}>{item.body}</Text>
+      ) : <Text style={commentStyles.commentText}>{""}</Text>
+      }
+      <View style={[commentStyles.reactionsContainer, { backgroundColor: theme.background }]}>
+        <TouchableOpacity
+          style={[commentStyles.addReactionButton, { backgroundColor: theme.primary }]}
+          onPress={() => {
+            // TODO: Implement reaction picker
+            // TODO: Submit reaction to API
+          }}
         >
-            <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
-                <View style={globalStyles.container}>
-                    {/* Video section */}
-                    <View style={{ flexShrink: 0 }}>
-                        <View style={[videoStyles.videoContainer, {
-                            backgroundColor: '#333',
-                            height: 200, // Fixed height instead of percentage
-                        }]}>
-                            {/* TODO:
-                            - Add video implementation
-                            - Add video poster from API if "isLive" is false
-                            */}
-                        </View>
+          <Text style={[commentStyles.addReactionText, { backgroundColor: theme.primary }]}>+</Text>
+        </TouchableOpacity>
+        {item.reaction_1_count > 0 && (
 
-                        {/* Live data section */}
-                        <View style={[videoStyles.livestreamInfoContainer,{backgroundColor: theme.background}]}>
-                            {isLive ?
-                                <View style={videoStyles.liveIndicatorContainer}>
-                                    <Text style={videoStyles.liveText}>● LIVE</Text>
-                                </View>
-                                : <View style={videoStyles.offlineIndicator}>
-                                    <Text style={videoStyles.offlineText}>OFFLINE</Text>
-                                </View>}
-                            <TouchableOpacity
-                                style={[videoStyles.viewerCountContainer,{backgroundColor: theme.primary}]}
-                                onPress={handleViewersList}
-                            >
-                                <Text><EyeIcon size={16} color={colors.white} /></Text>
-                                <Text style={videoStyles.viewerCountText}>{viewerCount}</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
+          <TouchableOpacity
+            style={commentStyles.reactionButton}
+            onPress={() => {
+              // TODO: Submit clicked emoji reaction to API
+            }}
+          >
+            <Text style={commentStyles.reactionText}>
+              {reactionAssets[0].utf8}
+            </Text>
+            <Text style={commentStyles.reactionCount}>{item.reaction_1_count}</Text>
+          </TouchableOpacity>
+        )}
+        {item.reaction_2_count > 0 && (
+          <TouchableOpacity
+            style={commentStyles.reactionButton}
+            onPress={() => {
+              // TODO: Submit clicked emoji reaction to API
+            }}
+          >
+            <Text style={commentStyles.reactionText}>
+              {reactionAssets[1].utf8}
+            </Text>
+            <Text style={commentStyles.reactionCount}>{item.reaction_2_count}</Text>
+          </TouchableOpacity>
+        )}
+        {item.reaction_3_count > 0 && (
+          <TouchableOpacity
+            style={commentStyles.reactionButton}
+            onPress={() => {
+              // TODO: Submit clicked emoji reaction to API
+            }}
+          >
+            <Text style={commentStyles.reactionText}>
+              {reactionAssets[2].utf8}
+            </Text>
+            <Text style={commentStyles.reactionCount}>{item.reaction_3_count}</Text>
+          </TouchableOpacity>
+        )}
+        {item.reaction_4_count > 0 && (
+          <TouchableOpacity
+            style={commentStyles.reactionButton}
+            onPress={() => {
+              // TODO: Submit clicked emoji reaction to API
+            }}
+          >
+            <Text style={commentStyles.reactionText}>
+              {reactionAssets[3].utf8}
+            </Text>
+            <Text style={commentStyles.reactionCount}>{item.reaction_4_count}</Text>
+          </TouchableOpacity>
+        )}
+        {item.reaction_5_count > 0 && (
+          <TouchableOpacity
+            style={[commentStyles.reactionButton, { backgroundColor: theme.primary }]}
+            onPress={() => {
+              // TODO: Submit clicked emoji reaction to API
+            }}
+          >
+            <Text style={commentStyles.reactionText}>
+              {reactionAssets[4].utf8}
+            </Text>
+            <Text style={commentStyles.reactionCount}>{item.reaction_5_count}</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+    </View>
+  );
 
-                    {/* Comments section */}
-                    <View style={[commentStyles.container, { flex: 1 }, {backgroundColor: theme.background}]}>
-                        <FlatList
-                            ref={flatListRef}
-                            data={comments}
-                            renderItem={renderComment}
-                            keyExtractor={item => item.id}
-                            contentContainerStyle={{ paddingBottom: 10 }}
-                            onLayout={scrollToBottom}
-                            onContentSizeChange={scrollToBottom}
-                            maintainVisibleContentPosition={{
-                                minIndexForVisible: 0,
-                                autoscrollToTopThreshold: 100
-                            }}
-                            removeClippedSubviews={false}
-                            initialNumToRender={comments.length}
-                            maxToRenderPerBatch={comments.length}
-                            windowSize={21}
-                        />
-
-                        {/* Comment input */}
-                        <View style={[
-                            commentStyles.inputContainer,
-                            { paddingBottom: Math.max(10, insets.bottom) },
-                            {backgroundColor: theme.background}
-                        ]}>
-                            <TextInput
-                                style={[commentStyles.textInput, {backgroundColor: theme.background}]}
-                                placeholder="Add a comment..."
-                                value={comment}
-                                onChangeText={setComment}
-                            />
-                            <TouchableOpacity
-                                onPress={handleSendComment}
-                                style={[
-                                    commentStyles.sendButton,
-                                    comment.trim() ? {backgroundColor: theme.primary} : commentStyles.sendButtonInactive
-                                ]}
-                                disabled={!comment.trim()}
-                            >
-                                <ArrowUp size={20} color="white" />
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                </View>
-            </SafeAreaView>
-        </KeyboardAvoidingView>
+  if (!isLive) {
+    return (
+      <SafeAreaView>
+        <Text style={{ textAlign: 'center', marginTop: 40 }}>
+          Not currently live.
+        </Text>
+      </SafeAreaView>
     );
+  }
+
+  if (!streamData?.stream_url) {
+    return (
+      <SafeAreaView>
+        <Text style={{ textAlign: 'center', marginTop: 40 }}>
+          Stream URL not available.
+        </Text>
+      </SafeAreaView>
+    );
+  }
+
+  // Page Renderer
+  return (
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}
+    >
+      <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
+        <View style={globalStyles.container}>
+          {/* Video section */}
+          <View style={{ flexShrink: 0 }}>
+            <View style={[videoStyles.videoContainer, {
+              backgroundColor: '#333',
+              height: 200, // Fixed height instead of percentage
+            }]}>
+              <View
+                style={{ width: '100%', aspectRatio: 16 / 9, backgroundColor: 'black' }}
+              >
+                <Video
+                  source={{ uri: streamData.stream_url }}
+                  useNativeControls
+                  resizeMode={ResizeMode.CONTAIN}
+                  style={{ width: '100%', height: '100%' }}
+                  shouldPlay
+                  onError={(e) => console.log('Video error:', e)}
+                />
+              </View>
+            </View>
+
+            {/* Live data section */}
+            <View style={[videoStyles.livestreamInfoContainer, { backgroundColor: theme.background }]}>
+              {isLive ?
+                <View style={videoStyles.liveIndicatorContainer}>
+                  <Text style={videoStyles.liveText}>● LIVE</Text>
+                </View>
+                : <View style={videoStyles.offlineIndicator}>
+                  <Text style={videoStyles.offlineText}>OFFLINE</Text>
+                </View>}
+              <TouchableOpacity
+                style={[videoStyles.viewerCountContainer, { backgroundColor: theme.primary }]}
+                onPress={handleViewersList}
+              >
+                <Text><EyeIcon size={16} color={colors.white} /></Text>
+                <Text style={videoStyles.viewerCountText}>{streamData.viewer_count}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Comments section */}
+          <View style={[commentStyles.container, { flex: 1 }, { backgroundColor: theme.background }]}>
+            <FlatList
+              ref={flatListRef}
+              data={events}
+              renderItem={renderEvent}
+              keyExtractor={item => item.id}
+              contentContainerStyle={{ paddingBottom: 10 }}
+              onLayout={scrollToBottom}
+              onContentSizeChange={scrollToBottom}
+              maintainVisibleContentPosition={{
+                minIndexForVisible: 0,
+                autoscrollToTopThreshold: 100
+              }}
+              removeClippedSubviews={false}
+              initialNumToRender={events.length}
+              maxToRenderPerBatch={events.length}
+              windowSize={21}
+            />
+
+            {/* Comment input */}
+            <View style={[
+              commentStyles.inputContainer,
+              { paddingBottom: Math.max(10, insets.bottom) },
+              { backgroundColor: theme.background }
+            ]}>
+              <TextInput
+                style={[commentStyles.textInput, { backgroundColor: theme.background }]}
+                placeholder="Add a comment..."
+                value={comment}
+                onChangeText={setComment}
+              />
+              <TouchableOpacity
+                onPress={handleSendComment}
+                style={[
+                  commentStyles.sendButton,
+                  comment.trim() ? { backgroundColor: theme.primary } : commentStyles.sendButtonInactive
+                ]}
+                disabled={!comment.trim()}
+              >
+                <ArrowUp size={20} color="white" />
+              </TouchableOpacity>
+            </View>
+          </View>
+      </SafeAreaView>
+    </KeyboardAvoidingView >
+  );
 } 

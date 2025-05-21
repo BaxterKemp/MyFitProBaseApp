@@ -1,11 +1,12 @@
 import { StackActions } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { RootStackParamList } from '../../App';
 import { globalStyles, homeStyles } from '../styles/screens.styles';
 import { useTheme } from '../theme/ThemeContext';
 import { colors } from '../theme/colors';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type HomeScreenProps = {
     navigation: NativeStackNavigationProp<RootStackParamList, 'Home'>;
@@ -13,8 +14,9 @@ type HomeScreenProps = {
 
 export default function HomeScreen({ navigation }: HomeScreenProps) {
     const { theme } = useTheme();
-    const handleLogout = () => {
-        navigation.dispatch(StackActions.pop());
+    const handleLogout = async () => {
+        await AsyncStorage.clear(); // Clear stored token
+        navigation.replace('Login'); // Reset stack and go to Login
     };
 
     const handleLivestream = () => {
@@ -25,10 +27,25 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
         navigation.navigate('LiveReplay');
     };
 
-    const isLive = true; // TODO: Implement API call to check if the business is live
+    const [isLive, setIsLive] = useState(false);
+
+    useEffect(() => {
+        const fetchLivestreamStatus = async () => {
+            try {
+                const response = await fetch('https://api.myfitpro.com/v1/business/993/status');
+                const data = await response.json();
+                setIsLive(data.isLive);
+            } catch (error) {
+                console.error('Failed to fetch livestream status:', error);
+                setIsLive(false);
+            }
+        };
+
+        fetchLivestreamStatus();
+    }, []);
 
     return (
-        <View style={[globalStyles.container, {backgroundColor: theme.background}]}>
+        <View style={[globalStyles.container, { backgroundColor: theme.background }]}>
             <View style={globalStyles.headerContainer}>
                 {/* TODO: Add API Logo implementation */}
             </View>
@@ -50,14 +67,14 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
             {/* Main buttons area */}
             <View style={homeStyles.buttonContainer}>
                 <TouchableOpacity
-                    style={[homeStyles.button, homeStyles.mainButton, {backgroundColor: theme.primary}]}
+                    style={[homeStyles.button, homeStyles.mainButton, { backgroundColor: theme.primary }]}
                     onPress={handleLivestream}
                 >
                     <Text style={globalStyles.primaryButtonText}>Live Stream</Text>
                 </TouchableOpacity>
                 {true && ( // TODO: Only show if business has Live Replay enabled
                     <TouchableOpacity
-                        style={[homeStyles.button, homeStyles.mainButton,  {backgroundColor: theme.primary}]}
+                        style={[homeStyles.button, homeStyles.mainButton, { backgroundColor: theme.primary }]}
                         onPress={handleLiveReplay}
                     >
                         <Text style={globalStyles.primaryButtonText}>Live Replay</Text>
