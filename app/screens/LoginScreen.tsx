@@ -1,6 +1,6 @@
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { useState } from 'react';
-import { Platform, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Image, Platform, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { RootStackParamList } from '../../App';
 import { globalStyles, loginStyles } from '../styles/screens.styles';
@@ -23,11 +23,11 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
     };
 
     return (
-        <SafeAreaView style={[globalStyles.container, styles.container]}>
-            <View style={globalStyles.headerContainer}>
-                {/* TODO: Add API Logo implementation */}
-            </View>
-
+        <SafeAreaView style={[globalStyles.container, styles.container, {backgroundColor: theme.background}]}>
+            <Image
+                source={{ uri: theme.logo }}
+                style={globalStyles.headerContainer}
+                />
             <View style={globalStyles.mainContent}>
                 <View style={globalStyles.formContainer}>
                     <TextInput
@@ -47,10 +47,11 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
                     />
 
                     <TouchableOpacity
-                        style={globalStyles.primaryButton}
+                        style={[globalStyles.primaryButton,{ backgroundColor: theme.primary}]}
                         onPress={handleLogin}
                     >
                         <Text style={globalStyles.primaryButtonText}>Login</Text>
+                        {/* [globalStyles.primaryButtonText,{color: theme.text.primary}] */}
                     </TouchableOpacity>
                 </View>
 

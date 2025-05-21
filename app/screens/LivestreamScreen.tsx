@@ -1,12 +1,12 @@
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ArrowUp, EyeIcon } from 'lucide-react-native';
-import React, { useContext, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { FlatList, KeyboardAvoidingView, Platform, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { RootStackParamList } from '../../App';
 import { commentStyles, globalStyles, videoStyles } from '../styles/screens.styles';
-import { ColorContext } from '../theme/colors';
-
+import { colors } from '../theme/colors';
+import { useTheme } from '../theme/ThemeContext';
 
 type LivestreamScreenProps = {
     navigation: NativeStackNavigationProp<RootStackParamList, 'Livestream'>;
@@ -27,9 +27,9 @@ type Comment = {
 };
 
 export default function LivestreamScreen({ navigation }: LivestreamScreenProps) {
-    const colors = useContext(ColorContext);
     // Comment Input Value
     const [comment, setComment] = useState('');
+    const { theme } = useTheme();
 
     const flatListRef = useRef<FlatList>(null);
 
@@ -111,26 +111,26 @@ export default function LivestreamScreen({ navigation }: LivestreamScreenProps) 
 
     // Comment Item Renderer
     const renderComment = ({ item }: { item: Comment }) => (
-        <View style={commentStyles.commentItem}>
-            <View style={commentStyles.commentHeader}>
-                <Text style={commentStyles.userName}>{item.userName}</Text>
-                <Text style={commentStyles.timestamp}>{item.timestamp}</Text>
+        <View style={[commentStyles.commentItem, {backgroundColor: theme.background}]}>
+            <View style={[commentStyles.commentHeader,{backgroundColor: theme.background}]}>
+                <Text style={[commentStyles.userName, {color: theme.text.primary }]}>{item.userName}</Text>
+                <Text style={[commentStyles.timestamp, {color: theme.text.primary }]}>{item.timestamp}</Text>
             </View>
-            <Text style={commentStyles.commentText}>{item.text}</Text>
-            <View style={commentStyles.reactionsContainer}>
+            <Text style={[commentStyles.commentText,{color: theme.text.primary}]}>{item.text}</Text>
+            <View style={[commentStyles.reactionsContainer, {backgroundColor: theme.background}]}>
                 <TouchableOpacity
-                    style={commentStyles.addReactionButton}
+                    style={[commentStyles.addReactionButton, {backgroundColor: theme.primary}]}
                     onPress={() => {
                         // TODO: Implement reaction picker
                         // TODO: Submit reaction to API
                     }}
                 >
-                    <Text style={commentStyles.addReactionText}>+</Text>
+                    <Text style={[commentStyles.addReactionText, {backgroundColor: theme.primary}]}>+</Text>
                 </TouchableOpacity>
                 {item.reactions.map((reaction, index) => (
                     <TouchableOpacity
                         key={index}
-                        style={commentStyles.reactionButton}
+                        style={[commentStyles.reactionButton,{backgroundColor: theme.primary}]}
                         onPress={() => {
                             // TODO: Submit clicked emoji reaction to API
                         }}
@@ -165,7 +165,7 @@ export default function LivestreamScreen({ navigation }: LivestreamScreenProps) 
                         </View>
 
                         {/* Live data section */}
-                        <View style={videoStyles.livestreamInfoContainer}>
+                        <View style={[videoStyles.livestreamInfoContainer,{backgroundColor: theme.background}]}>
                             {isLive ?
                                 <View style={videoStyles.liveIndicatorContainer}>
                                     <Text style={videoStyles.liveText}>● LIVE</Text>
@@ -174,7 +174,7 @@ export default function LivestreamScreen({ navigation }: LivestreamScreenProps) 
                                     <Text style={videoStyles.offlineText}>OFFLINE</Text>
                                 </View>}
                             <TouchableOpacity
-                                style={videoStyles.viewerCountContainer}
+                                style={[videoStyles.viewerCountContainer,{backgroundColor: theme.primary}]}
                                 onPress={handleViewersList}
                             >
                                 <Text><EyeIcon size={16} color={colors.white} /></Text>
@@ -184,7 +184,7 @@ export default function LivestreamScreen({ navigation }: LivestreamScreenProps) 
                     </View>
 
                     {/* Comments section */}
-                    <View style={[commentStyles.container, { flex: 1 }]}>
+                    <View style={[commentStyles.container, { flex: 1 }, {backgroundColor: theme.background}]}>
                         <FlatList
                             ref={flatListRef}
                             data={comments}
@@ -206,10 +206,11 @@ export default function LivestreamScreen({ navigation }: LivestreamScreenProps) 
                         {/* Comment input */}
                         <View style={[
                             commentStyles.inputContainer,
-                            { paddingBottom: Math.max(10, insets.bottom) }
+                            { paddingBottom: Math.max(10, insets.bottom) },
+                            {backgroundColor: theme.background}
                         ]}>
                             <TextInput
-                                style={commentStyles.textInput}
+                                style={[commentStyles.textInput, {backgroundColor: theme.background}]}
                                 placeholder="Add a comment..."
                                 value={comment}
                                 onChangeText={setComment}
@@ -218,7 +219,7 @@ export default function LivestreamScreen({ navigation }: LivestreamScreenProps) 
                                 onPress={handleSendComment}
                                 style={[
                                     commentStyles.sendButton,
-                                    comment.trim() ? commentStyles.sendButtonActive : commentStyles.sendButtonInactive
+                                    comment.trim() ? {backgroundColor: theme.primary} : commentStyles.sendButtonInactive
                                 ]}
                                 disabled={!comment.trim()}
                             >

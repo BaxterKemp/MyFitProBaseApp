@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { ThemeProvider } from './app/theme/ThemeContext';
+import { ThemeProvider, useTheme } from './app/theme/ThemeContext';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
-import { View, TouchableOpacity } from 'react-native';
+import { View, TouchableOpacity, Image } from 'react-native';
 import { Cast, Settings } from 'lucide-react-native';
 
 // Import screens
@@ -41,17 +41,21 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 // Logo placeholder component
 const LogoTitle = () => {
+    const { theme } = useTheme();
     return (
-        <View style={{
-            width: 120,
-            height: 36,
-            backgroundColor: 'lightgray',
-            borderRadius: 4
-        }} />
+        <Image 
+        source={{ uri: theme.logo }}
+        style={{
+        width: 120,
+        height: 36,
+        resizeMode: 'contain',
+        }}
+        />
     );
 };
 
 export default function App() {
+    const { theme } = useTheme();
     useEffect(() => {
         // Hide the splash screen after we've handled any initial setup
         SplashScreen.hideAsync();
@@ -125,6 +129,9 @@ export default function App() {
                                 headerBackTitle: "Back",
                                 headerShown: true,
                                 animation: 'slide_from_right',
+                                headerStyle:{
+                                    backgroundColor: theme.background,
+                                }
                             }}
                         />
                         <Stack.Screen

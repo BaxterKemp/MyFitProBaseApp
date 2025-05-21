@@ -4,12 +4,15 @@ import React from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 import { RootStackParamList } from '../../App';
 import { globalStyles, homeStyles } from '../styles/screens.styles';
+import { useTheme } from '../theme/ThemeContext';
+import { colors } from '../theme/colors';
 
 type HomeScreenProps = {
     navigation: NativeStackNavigationProp<RootStackParamList, 'Home'>;
 };
 
 export default function HomeScreen({ navigation }: HomeScreenProps) {
+    const { theme } = useTheme();
     const handleLogout = () => {
         navigation.dispatch(StackActions.pop());
     };
@@ -25,7 +28,7 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
     const isLive = true; // TODO: Implement API call to check if the business is live
 
     return (
-        <View style={globalStyles.container}>
+        <View style={[globalStyles.container, {backgroundColor: theme.background}]}>
             <View style={globalStyles.headerContainer}>
                 {/* TODO: Add API Logo implementation */}
             </View>
@@ -47,14 +50,14 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
             {/* Main buttons area */}
             <View style={homeStyles.buttonContainer}>
                 <TouchableOpacity
-                    style={[homeStyles.button, homeStyles.mainButton]}
+                    style={[homeStyles.button, homeStyles.mainButton, {backgroundColor: theme.primary}]}
                     onPress={handleLivestream}
                 >
                     <Text style={globalStyles.primaryButtonText}>Live Stream</Text>
                 </TouchableOpacity>
                 {true && ( // TODO: Only show if business has Live Replay enabled
                     <TouchableOpacity
-                        style={[homeStyles.button, homeStyles.mainButton]}
+                        style={[homeStyles.button, homeStyles.mainButton,  {backgroundColor: theme.primary}]}
                         onPress={handleLiveReplay}
                     >
                         <Text style={globalStyles.primaryButtonText}>Live Replay</Text>

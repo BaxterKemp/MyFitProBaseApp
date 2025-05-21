@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { RootStackParamList } from '../../App';
 import { liveReplayStyles } from '../styles/screens.styles';
 import { colors } from '../theme/colors';
+import { useTheme } from '../theme/ThemeContext';
 
 type LiveReplayScreenProps = {
     navigation: NativeStackNavigationProp<RootStackParamList, 'LiveReplay'>;
@@ -44,9 +45,10 @@ const replayData = [
 ];
 
 export default function LiveReplayScreen({ navigation }: LiveReplayScreenProps) {
+    const { theme } = useTheme();
     const renderReplayItem = ({ item }: { item: typeof replayData[0] }) => (
         <TouchableOpacity
-            style={liveReplayStyles.replayItem}
+            style={[liveReplayStyles.replayItem, {backgroundColor: theme.background}]}
             onPress={() => navigation.navigate('ReplayDetail', { replayData: item })}
         >
             <Image
@@ -55,17 +57,17 @@ export default function LiveReplayScreen({ navigation }: LiveReplayScreenProps) 
                 resizeMode="cover"
             />
             <View style={liveReplayStyles.contentContainer}>
-                <Text style={liveReplayStyles.title}>{item.title}</Text>
-                <Text style={liveReplayStyles.subText}>{`${item.timeAgo} - ${item.duration}`}</Text>
+                <Text style={[liveReplayStyles.title, {color: theme.text.primary}]}>{item.title}</Text>
+                <Text style={[liveReplayStyles.subText, {color: theme.text.primary}]}>{`${item.timeAgo} - ${item.duration}`}</Text>
             </View>
-            <View style={liveReplayStyles.playButton}>
+            <View style={[liveReplayStyles.playButton,{backgroundColor: theme.primary}]}>
                 <Play size={20} color={colors.white} />
             </View>
         </TouchableOpacity>
     );
 
     return (
-        <SafeAreaView style={liveReplayStyles.container} edges={['left', 'right']}>
+        <SafeAreaView style={[liveReplayStyles.container,{backgroundColor: theme.background}]} edges={['left', 'right']}>
             <FlatList
                 data={replayData}
                 renderItem={renderReplayItem}

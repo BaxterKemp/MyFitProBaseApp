@@ -13,6 +13,7 @@ type Theme = {
     white: string,
     live: string,
     logo?: string,
+    banner?: string,
 };
 
 
@@ -48,7 +49,8 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
     border: '#DDDDDD',
     white: '#FFFFFF',
     live: '#FF0000',
-    logo: apiData.app_logos_light,
+    logo: apiData.app_icon,
+    banner: apiData.app_logo_light
   });
 
   useEffect(() => {
@@ -57,6 +59,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
         const res = await axios.get('https://api.myfitpro.com/v1/branded-app/business/993');
         const transformedTheme = transformThemeFromAPI(res.data);
         setTheme(transformedTheme);
+        console.log(res.data);
       } catch (error) {
         if (axios.isAxiosError(error)) {
             console.error('Theme API error:', {
