@@ -107,6 +107,7 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
             value={class_password}
             onChangeText={setPassword}
             secureTextEntry
+            autoComplete="off"
           />
 
           <TextInput
@@ -115,6 +116,7 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
             value={business_id}
             onChangeText={setID}
             secureTextEntry
+            autoComplete="off"
           />
 
           <TouchableOpacity
