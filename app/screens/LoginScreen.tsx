@@ -8,6 +8,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { useTheme } from '../theme/ThemeContext';
+import { BUSINESS_ID } from '../Business_ID';
 
 type LoginScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'Login'>;
@@ -18,23 +19,23 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
   const [class_password, setPassword] = useState('');
   const { theme } = useTheme();
 
-  const [business_id, setID] = useState('');
 
   const handleLogin = async () => {
     const trimmedName = name.trim();
     const trimmedPassword = class_password.trim();
-    const trimmedID = business_id.trim();
+    
 
-    if (!trimmedName || !trimmedPassword || !trimmedID) {
+
+    if (!trimmedName || !trimmedPassword) {
       Alert.alert('Missing Fields', 'Please fill in all fields.');
       return;
     }
 
     const formData = new FormData();
-    formData.append('business_slug', ''); // as per your request sample, however Alex said the post data would just need to include name, class_password, and business_id.
-    formData.append('business_id', trimmedID);
     formData.append('name', trimmedName);
     formData.append('class_password', trimmedPassword);
+    formData.append('business_id', BUSINESS_ID);
+
 
     try {
       const response = await axios.post(
@@ -97,15 +98,6 @@ export default function LoginScreen({ navigation }: LoginScreenProps) {
             placeholder="Class Password"
             value={class_password}
             onChangeText={setPassword}
-            secureTextEntry
-            autoComplete="off"
-          />
-
-          <TextInput
-            style={globalStyles.input}
-            placeholder="Business ID (TO BE HIDDEN)"
-            value={business_id}
-            onChangeText={setID}
             secureTextEntry
             autoComplete="off"
           />
